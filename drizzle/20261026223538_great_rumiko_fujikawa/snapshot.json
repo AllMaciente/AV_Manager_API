@@ -1,0 +1,163 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "0e76d593-4ab9-4ed1-96c1-ff11f4572ab8",
+  "prevIds": [
+    "a9dc202f-d35d-43f6-bf61-3df1828e899f"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "circuito"
+      ],
+      "writes": [
+        "s|tbl|public.circuito",
+        "n|tbl|public.circuito",
+        "e|tbl|public.circuito",
+        "n|rel|public.circuito",
+        "n|type|public.circuito",
+        "n|rel|public.circuito_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "users",
+        "circuito_id"
+      ],
+      "writes": [
+        "s|col|public.users.circuito_id",
+        "n|col|public.users.circuito_id",
+        "e|col|public.users.circuito_id"
+      ],
+      "reads": [
+        "n|tbl|public.users",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "users"
+      ],
+      "writes": [
+        "s|fk|public.users.users_circuito_id_circuito_id_fkey",
+        "n|fk|public.users.users_circuito_id_circuito_id_fkey",
+        "e|fk|public.users.users_circuito_id_circuito_id_fkey",
+        "n|con|public.users.users_circuito_id_circuito_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|tbl|public.circuito",
+        "n|sch|public",
+        "n|col|public.users.circuito_id",
+        "n|col|public.circuito.id",
+        "e|uniqueness|public.circuito.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "circuito",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "circuito",
+        "name": "id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "circuito",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "users",
+        "name": "circuito_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "users",
+        "name": "users_circuito_id_circuito_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "circuito_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "circuito",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "circuito",
+        "name": "circuito_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    }
+  ]
+}

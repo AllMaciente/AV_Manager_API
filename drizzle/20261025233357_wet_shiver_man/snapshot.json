@@ -1,0 +1,331 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "273dfb01-16bb-41c2-b97a-250189dc4101",
+  "prevIds": [
+    "2c42d7e5-ab9b-4812-85b6-8371d5809bf9"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "permissions"
+      ],
+      "writes": [
+        "s|tbl|public.permissions",
+        "n|tbl|public.permissions",
+        "e|tbl|public.permissions",
+        "n|rel|public.permissions",
+        "n|type|public.permissions",
+        "n|rel|public.permissions_pkey",
+        "n|rel|public.permissions_key_key"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_permissions"
+      ],
+      "writes": [
+        "s|tbl|public.user_permissions",
+        "n|tbl|public.user_permissions",
+        "e|tbl|public.user_permissions",
+        "n|rel|public.user_permissions",
+        "n|type|public.user_permissions",
+        "n|rel|public.user_permissions_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "users",
+        "is_admin"
+      ],
+      "writes": [
+        "s|col|public.users.is_admin",
+        "n|col|public.users.is_admin",
+        "e|col|public.users.is_admin"
+      ],
+      "reads": [
+        "n|tbl|public.users",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "recreate_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "users",
+        "users_email_unique"
+      ],
+      "writes": [
+        "s|idx|public.users_email_unique",
+        "n|idx|public.users_email_unique",
+        "e|idx|public.users_email_unique",
+        "n|rel|public.users_email_unique"
+      ],
+      "reads": [
+        "n|tbl|public.users",
+        "n|sch|public"
+      ],
+      "sharedWrites": [],
+      "sqlHash": "bf2d2bda93996016"
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_permissions"
+      ],
+      "writes": [
+        "s|fk|public.user_permissions.user_permissions_user_id_users_id_fkey",
+        "n|fk|public.user_permissions.user_permissions_user_id_users_id_fkey",
+        "e|fk|public.user_permissions.user_permissions_user_id_users_id_fkey",
+        "n|con|public.user_permissions.user_permissions_user_id_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.user_permissions",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.user_permissions.user_id",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_permissions"
+      ],
+      "writes": [
+        "s|fk|public.user_permissions.user_permissions_permission_id_permissions_id_fkey",
+        "n|fk|public.user_permissions.user_permissions_permission_id_permissions_id_fkey",
+        "e|fk|public.user_permissions.user_permissions_permission_id_permissions_id_fkey",
+        "n|con|public.user_permissions.user_permissions_permission_id_permissions_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.user_permissions",
+        "n|sch|public",
+        "n|tbl|public.permissions",
+        "n|sch|public",
+        "n|col|public.user_permissions.permission_id",
+        "n|col|public.permissions.id",
+        "e|uniqueness|public.permissions.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "permissions",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "user_permissions",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "permissions",
+        "name": "id",
+        "type": "smallserial",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "permissions",
+        "name": "key",
+        "type": "varchar(64)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_permissions",
+        "name": "user_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_permissions",
+        "name": "permission_id",
+        "type": "smallint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "users",
+        "name": "is_admin",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_permissions",
+        "name": "user_permissions_user_id_users_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "user_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_permissions",
+        "name": "user_permissions_permission_id_permissions_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "permission_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "permissions",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_permissions",
+        "name": "user_permissions_pkey",
+        "columns": [
+          "user_id",
+          "permission_id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "permissions",
+        "name": "permissions_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "permissions",
+        "name": "permissions_key_key",
+        "nameExplicit": false,
+        "columns": [
+          "key"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "indexes\u0000[\"public\",\"users_email_unique\"]",
+      "set": {
+        "columns": [
+          {
+            "value": "lower(\"email\"",
+            "isExpression": true,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ]
+      }
+    }
+  ]
+}

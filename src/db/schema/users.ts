@@ -2,6 +2,8 @@ import { nanoid } from "nanoid";
 import { pgTable, varchar, text, timestamp, uniqueIndex, boolean } from 'drizzle-orm/pg-core'
 import { sql } from "drizzle-orm";
 import { circuito } from "./circuito";
+import { relations } from "drizzle-orm/_relations";
+import { userEquipamentos } from "./userEquipamentos";
 
 export const users = pgTable("users", {
     id: varchar("id", { length: 12 })
@@ -24,3 +26,8 @@ export const users = pgTable("users", {
         uniqueIndex("users_username_unique").on(sql`lower(${t.username})`),
     ]
 )
+
+
+export const usersRelations = relations(users, ({ many }) => ({
+    equipamentos: many(userEquipamentos)
+}))

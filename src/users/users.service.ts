@@ -11,11 +11,17 @@ export type CreateUserData = {
     lastName: string;
     email?: string;
     password: string;
+    isAdmin?: boolean;
 };
 
 @Injectable()
 export class UsersService {
     constructor(@Inject(DRIZZLE) private db: DB) { }
+
+    async count(): Promise<number> {
+        const result = await this.db.select({ count: sql<number>`count(*)` }).from(users);
+        return Number(result[0]?.count ?? 0);
+    }
 
     async findById(id: string) {
         const [user] = await this.db
@@ -74,7 +80,15 @@ export class UsersService {
     async create(data: CreateUserData) {
         const [user] = await this.db
             .insert(users)
-            .values(data)
+            .values({
+                username: data.username,
+                firstName: data.firstName,
+                middleName: data.middleName ?? null,
+                lastName: data.lastName,
+                email: data.email ?? null,
+                password: data.password,
+                isAdmin: data.isAdmin ?? false,
+            })
             .returning({
                 id: users.id,
                 username: users.username,

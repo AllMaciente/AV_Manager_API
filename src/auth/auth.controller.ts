@@ -5,6 +5,7 @@ import {
     ApiBody,
     ApiConflictResponse,
     ApiCreatedResponse,
+    ApiForbiddenResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -13,6 +14,7 @@ import {
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { loginSchema, registerSchema } from './auth.schemas';
 import type { LoginDto, RegisterDto } from './auth.schemas';
@@ -31,9 +33,11 @@ export class AuthController {
     constructor(private auth: AuthService) { }
 
     @Post('register')
+    @UseGuards(OptionalJwtAuthGuard)
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Cadastrar usuário',
-        description: 'Email e nome do meio são opcionais.',
+        description: 'Se não houver usuários cadastrados, o primeiro usuário será criado como administrador. Caso contrário, é necessário estar autenticado como administrador ou ter a permissão users.create.',
     })
     @ApiBody({ schema: registerBodySchema })
     @ApiCreatedResponse({
@@ -45,9 +49,14 @@ export class AuthController {
         description: 'Username ou email já cadastrado',
         schema: errorSchema,
     })
+    @ApiForbiddenResponse({
+        description: 'Sem permissão para cadastrar usuários',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
     @UsePipes(new ZodValidationPipe(registerSchema))
-    async register(@Body() body: RegisterDto) {
-        return this.auth.register(body);
+    async register(@Body() body: RegisterDto, @Req() req: any) {
+        return this.auth.register(body, req.user ?? null);
     }
 
     @UseGuards(LocalAuthGuard)

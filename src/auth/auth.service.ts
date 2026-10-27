@@ -1,7 +1,8 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
+import { PermissionsService } from '../permissions/permissions.service';
 import type { LoginDto, RegisterDto } from './auth.schemas';
 
 type TokenUser = {
@@ -20,6 +21,7 @@ export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwt: JwtService,
+        private permissionsService: PermissionsService,
     ) { }
 
     async validateUser(username: string, pass: string): Promise<any> {
@@ -31,9 +33,53 @@ export class AuthService {
         return null;
     }
 
-    async register({ username, firstName, middleName, lastName, email, password }: RegisterDto) {
+    async register(
+        { username, firstName, middleName, lastName, email, password }: RegisterDto,
+        requester?: TokenUser | null,
+    ) {
         const existing = await this.usersService.findByUsernameOrEmail(username, email);
         if (existing) throw new ConflictException('Username ou email já cadastrado');
+
+        const count = await this.usersService.count();
+
+        if (count === 0) {
+            const hash = await argon2.hash(password);
+            const user = await this.usersService.create({
+                username,
+                firstName,
+                middleName,
+                lastName,
+                email,
+                password: hash,
+                isAdmin: true,
+            });
+
+            return { user, accessToken: await this.signToken(user) };
+        }
+
+        if (!requester) {
+            throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
+        }
+
+        if (requester.isAdmin) {
+            const hash = await argon2.hash(password);
+            const user = await this.usersService.create({
+                username,
+                firstName,
+                middleName,
+                lastName,
+                email,
+                password: hash,
+                isAdmin: false,
+            });
+
+            return { user, accessToken: await this.signToken(user) };
+        }
+
+        const owned = await this.permissionsService.getUserPermissions(requester.id);
+        if (!owned.has('users.create')) {
+            throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
+        }
 
         const hash = await argon2.hash(password);
         const user = await this.usersService.create({
@@ -43,6 +89,7 @@ export class AuthService {
             lastName,
             email,
             password: hash,
+            isAdmin: false,
         });
 
         return { user, accessToken: await this.signToken(user) };

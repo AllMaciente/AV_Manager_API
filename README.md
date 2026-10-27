@@ -1,98 +1,128 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# AV Manager API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API de gerenciamento de equipes de áudio e vídeo, construída com [NestJS](https://nestjs.com/).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Visão geral
 
-## Description
+- Cadastro e login de usuários (login por `username`, email opcional).
+- Circuitos com nome, aos quais os usuários podem ser vinculados (um circuito por usuário, vários usuários por circuito).
+- Permissões por usuário, com chaves granulares e filtro por curinga.
+- Documentação Swagger/OpenAPI de todas as rotas.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Stack
 
-## Project setup
+- NestJS 11 + TypeScript
+- PostgreSQL + Drizzle ORM
+- Autenticação JWT (Passport)
+- Validação com Zod
+- Hash de senha com Argon2
+- Swagger (`@nestjs/swagger`)
+
+## Configuração
+
+Crie um arquivo `.env` na raiz:
 
 ```bash
-$ npm install
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/av_manager"
+JWT_SECRET="troque-este-segredo"
+PORT=3000
 ```
 
-## Compile and run the project
+Instale as dependências e aplique as migrations:
 
 ```bash
-# development
-$ npm run start
+npm install
+npx drizzle-kit migrate
+```
+
+## Executando
+
+```bash
+# desenvolvimento
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
-# production mode
-$ npm run start:prod
+# produção (após npm run build)
+npm run start:prod
 ```
 
-## Run tests
+## Documentação
+
+Com a API no ar:
+
+- Swagger UI: `http://localhost:3000/api`
+- OpenAPI JSON: `http://localhost:3000/api-json`
+
+Use o botão **Authorize** e informe o `accessToken` retornado pelo login para testar as rotas protegidas.
+
+## Health check
+
+```http
+GET /ping
+```
+
+Resposta: `pong`.
+
+## Autenticação
+
+```http
+POST /auth/register
+POST /auth/login
+GET  /auth/me
+```
+
+O cadastro exige `username`, `firstName`, `lastName` e `password`; `middleName` e `email` são opcionais.
+
+## Rotas
+
+### Circuitos
+
+| Método | Rota | Permissão |
+| --- | --- | --- |
+| GET | `/circuitos` | autenticado |
+| GET | `/circuitos/:id` | autenticado |
+| GET | `/circuitos/:id/users` | autenticado |
+| POST | `/circuitos` | `circuito.create` |
+| PATCH | `/circuitos/:id` | `circuito.edit` |
+| PATCH | `/circuitos/:id/users/:userId` | `circuito.edit` |
+
+### Usuários e permissões
+
+| Método | Rota | Permissão |
+| --- | --- | --- |
+| GET | `/users/me/permissions` | autenticado |
+| GET | `/users/:userId/permissions` | `users.viewPerm` |
+| PUT | `/users/me/permissions` | `users.setPerm` |
+| PUT | `/users/:userId/permissions` | `users.setPerm` |
+
+As rotas de leitura aceitam o query param `pattern` para filtrar chaves exatas ou por curinga:
+
+```http
+GET /users/me/permissions?pattern=circuito.*
+```
+
+Usuários com `is_admin` têm acesso total, independentemente das permissões atribuídas.
+
+## Estrutura
+
+```
+src/
+  auth/          cadastro, login, JWT e guards
+  circuitos/     CRUD de circuitos e vínculo de usuários
+  permissions/   catálogo, guards e gestão de permissões
+  users/         acesso a dados de usuários
+  db/            schema Drizzle e conexão
+  swagger/       schemas compartilhados da documentação
+drizzle/         migrations geradas pelo drizzle-kit
+```
+
+## Scripts
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run build       # compila para dist/
+npm run start:dev   # servidor com reload
+npm run test        # testes unitários
+npm run test:e2e    # testes end-to-end
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

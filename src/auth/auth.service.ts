@@ -1,8 +1,19 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import type { LoginDto, RegisterDto } from './auth.schemas';
+
+type TokenUser = {
+    id: string;
+    username: string;
+    firstName: string;
+    middleName: string | null;
+    lastName: string;
+    email: string | null;
+    isAdmin: boolean;
+    circuitoId: string | null;
+};
 
 @Injectable()
 export class AuthService {
@@ -11,8 +22,8 @@ export class AuthService {
         private jwt: JwtService,
     ) { }
 
-    async validateUser(email: string, pass: string): Promise<any> {
-        const user = await this.usersService.findByEmail(email);
+    async validateUser(username: string, pass: string): Promise<any> {
+        const user = await this.usersService.findByUsername(username);
         if (user && (await argon2.verify(user.password, pass))) {
             const { password, ...result } = user;
             return result;
@@ -20,31 +31,53 @@ export class AuthService {
         return null;
     }
 
-    async register({ username, email, password }: RegisterDto) {
-        const existing = await this.usersService.findByEmailOrUsername(email, username);
-        if (existing) throw new ConflictException('Email ou username já cadastrado');
+    async register({ username, firstName, middleName, lastName, email, password }: RegisterDto) {
+        const existing = await this.usersService.findByUsernameOrEmail(username, email);
+        if (existing) throw new ConflictException('Username ou email já cadastrado');
 
         const hash = await argon2.hash(password);
-        const user = await this.usersService.create({ username, email, password: hash });
-
-        const accessToken = await this.jwt.signAsync({
-            sub: user.id,
-            email: user.email,
-            username: user.username,
+        const user = await this.usersService.create({
+            username,
+            firstName,
+            middleName,
+            lastName,
+            email,
+            password: hash,
         });
-        return { user, accessToken };
+
+        return { user, accessToken: await this.signToken(user) };
     }
 
     async login(user: any) {
-        const payload = { sub: user.id, email: user.email, username: user.username };
         return {
-            accessToken: await this.jwt.signAsync(payload),
+            accessToken: await this.signToken(user),
         };
     }
 
-    async loginWithBody({ email, password }: LoginDto) {
-        const user = await this.validateUser(email, password);
+    async getProfile(userId: string) {
+        const user = await this.usersService.findById(userId);
+        if (!user) throw new NotFoundException('Usuário não encontrado');
+
+        const { password, ...profile } = user;
+        return profile;
+    }
+
+    async loginWithBody({ username, password }: LoginDto) {
+        const user = await this.validateUser(username, password);
         if (!user) throw new UnauthorizedException('Credenciais inválidas');
         return this.login(user);
+    }
+
+    private signToken(user: TokenUser) {
+        return this.jwt.signAsync({
+            sub: user.id,
+            username: user.username,
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            circuitoId: user.circuitoId,
+        });
     }
 }

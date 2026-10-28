@@ -73,6 +73,42 @@ export const userProfileSchema: SchemaObject = {
     ],
 };
 
+export const userListItemSchema: SchemaObject = {
+    type: 'object',
+    properties: {
+        ...userSummaryProperties,
+        isAdmin: { type: 'boolean', example: false },
+        circuitoId: { type: 'string', nullable: true, example: 'Aw_M6jP36B8F' },
+        circuitoName: { type: 'string', nullable: true, example: 'SC-004' },
+        createdAt: {
+            type: 'string',
+            format: 'date-time',
+            example: '2026-10-26T12:00:00.000Z',
+        },
+    },
+    required: [
+        'id',
+        'username',
+        'firstName',
+        'lastName',
+        'isAdmin',
+        'circuitoId',
+        'createdAt',
+    ],
+};
+
+export const userListResponseSchema: SchemaObject = {
+    type: 'object',
+    properties: {
+        items: { type: 'array', items: userListItemSchema },
+        total: { type: 'integer', example: 42 },
+        page: { type: 'integer', example: 1 },
+        limit: { type: 'integer', example: 20 },
+        totalPages: { type: 'integer', example: 3 },
+    },
+    required: ['items', 'total', 'page', 'limit', 'totalPages'],
+};
+
 export const authUserSchema: SchemaObject = {
     type: 'object',
     properties: {

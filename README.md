@@ -92,10 +92,17 @@ O cadastro exige `username`, `firstName`, `lastName` e `password`; `middleName` 
 
 | Método | Rota | Permissão |
 | --- | --- | --- |
+| GET | `/users` | `users.view` |
 | GET | `/users/me/permissions` | autenticado |
 | GET | `/users/:userId/permissions` | `users.viewPerm` |
 | PUT | `/users/me/permissions` | `users.setPerm` |
 | PUT | `/users/:userId/permissions` | `users.setPerm` |
+
+A listagem de usuários aceita os query params `search` (username, nome ou email), `circuitoId`, `isAdmin`, `page` e `limit`:
+
+```http
+GET /users?circuitoId=Aw_M6jP36B8F&search=joao&page=1&limit=20
+```
 
 As rotas de leitura aceitam o query param `pattern` para filtrar chaves exatas ou por curinga:
 

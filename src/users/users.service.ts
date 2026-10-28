@@ -1,8 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { eq, or, sql } from 'drizzle-orm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { and, eq, ilike, or, sql } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
-import { users } from '../db/schema';
+import { circuito, users } from '../db/schema';
+import type { ListUsersQueryDto } from './users.schemas';
 
 export type CreateUserData = {
     username: string;
@@ -12,6 +14,19 @@ export type CreateUserData = {
     email?: string;
     password: string;
     isAdmin?: boolean;
+    circuitoId?: string;
+};
+
+const userSummaryColumns = {
+    id: users.id,
+    username: users.username,
+    firstName: users.firstName,
+    middleName: users.middleName,
+    lastName: users.lastName,
+    email: users.email,
+    isAdmin: users.isAdmin,
+    circuitoId: users.circuitoId,
+    createdAt: users.createdAt,
 };
 
 @Injectable()
@@ -21,6 +36,61 @@ export class UsersService {
     async count(): Promise<number> {
         const result = await this.db.select({ count: sql<number>`count(*)` }).from(users);
         return Number(result[0]?.count ?? 0);
+    }
+
+    async findAll({ search, circuitoId, isAdmin, page, limit }: ListUsersQueryDto) {
+        const conditions: SQL[] = [];
+
+        if (circuitoId) {
+            conditions.push(eq(users.circuitoId, circuitoId));
+        }
+
+        if (isAdmin !== undefined) {
+            conditions.push(eq(users.isAdmin, isAdmin));
+        }
+
+        if (search) {
+            const term = `%${search}%`;
+            conditions.push(
+                or(
+                    ilike(users.username, term),
+                    ilike(users.firstName, term),
+                    ilike(users.middleName, term),
+                    ilike(users.lastName, term),
+                    ilike(users.email, term),
+                )!,
+            );
+        }
+
+        const where = conditions.length ? and(...conditions) : undefined;
+
+        const [items, totalResult] = await Promise.all([
+            this.db
+                .select({
+                    ...userSummaryColumns,
+                    circuitoName: circuito.name,
+                })
+                .from(users)
+                .leftJoin(circuito, eq(circuito.id, users.circuitoId))
+                .where(where)
+                .orderBy(users.username)
+                .limit(limit)
+                .offset((page - 1) * limit),
+            this.db
+                .select({ count: sql<number>`count(*)` })
+                .from(users)
+                .where(where),
+        ]);
+
+        const total = Number(totalResult[0]?.count ?? 0);
+
+        return {
+            items,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 
     async findById(id: string) {

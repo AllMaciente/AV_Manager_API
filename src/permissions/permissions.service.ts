@@ -21,7 +21,7 @@ const filterPermissions = (keys: string[], pattern?: string) => {
 
 @Injectable()
 export class PermissionsService {
-  constructor(@Inject(DRIZZLE) private db: DB) {}
+  constructor(@Inject(DRIZZLE) private db: DB) { }
 
   async getUserPermissionsView(userId: string, pattern?: string) {
     const user = await this.getUserOrThrow(userId);

@@ -148,6 +148,18 @@ export class UsersService {
     }
 
     async create(data: CreateUserData) {
+        if (data.circuitoId) {
+            const [existingCircuito] = await this.db
+                .select({ id: circuito.id })
+                .from(circuito)
+                .where(eq(circuito.id, data.circuitoId))
+                .limit(1);
+
+            if (!existingCircuito) {
+                throw new BadRequestException('Circuito não encontrado');
+            }
+        }
+
         const [user] = await this.db
             .insert(users)
             .values({
@@ -158,6 +170,7 @@ export class UsersService {
                 email: data.email ?? null,
                 password: data.password,
                 isAdmin: data.isAdmin ?? false,
+                circuitoId: data.circuitoId ?? null,
             })
             .returning({
                 id: users.id,

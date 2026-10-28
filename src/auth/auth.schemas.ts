@@ -17,6 +17,10 @@ export const registerSchema = z.object({
         emptyToUndefined,
         z.string().email().toLowerCase().optional(),
     ),
+    circuitoId: z.preprocess(
+        emptyToUndefined,
+        z.string().trim().min(1).max(12).optional(),
+    ),
     password: z.string().min(8, 'Mínimo de 8 caracteres').max(128),
 });
 

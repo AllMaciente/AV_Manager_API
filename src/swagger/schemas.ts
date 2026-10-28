@@ -156,6 +156,13 @@ export const registerBodySchema: SchemaObject = {
             example: 'joao@example.com',
             description: 'Opcional',
         },
+        circuitoId: {
+            type: 'string',
+            nullable: true,
+            maxLength: 12,
+            example: 'Aw_M6jP36B8F',
+            description: 'Circuito do usuário (opcional)',
+        },
         password: {
             type: 'string',
             format: 'password',

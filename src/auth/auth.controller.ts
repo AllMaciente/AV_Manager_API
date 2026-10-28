@@ -37,7 +37,7 @@ export class AuthController {
     @ApiBearerAuth()
     @ApiOperation({
         summary: 'Cadastrar usuário',
-        description: 'Se não houver usuários cadastrados, o primeiro usuário será criado como administrador. Caso contrário, é necessário estar autenticado como administrador ou ter a permissão users.create.',
+        description: 'Se não houver usuários cadastrados, o primeiro usuário será criado como administrador. Caso contrário, é necessário estar autenticado como administrador ou ter a permissão users.create. O campo circuitoId é opcional.',
     })
     @ApiBody({ schema: registerBodySchema })
     @ApiCreatedResponse({

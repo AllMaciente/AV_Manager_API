@@ -34,51 +34,28 @@ export class AuthService {
     }
 
     async register(
-        { username, firstName, middleName, lastName, email, password }: RegisterDto,
+        { username, firstName, middleName, lastName, email, circuitoId, password }: RegisterDto,
         requester?: TokenUser | null,
     ) {
         const existing = await this.usersService.findByUsernameOrEmail(username, email);
         if (existing) throw new ConflictException('Username ou email já cadastrado');
 
         const count = await this.usersService.count();
+        let isAdmin = false;
 
         if (count === 0) {
-            const hash = await argon2.hash(password);
-            const user = await this.usersService.create({
-                username,
-                firstName,
-                middleName,
-                lastName,
-                email,
-                password: hash,
-                isAdmin: true,
-            });
+            isAdmin = true;
+        } else {
+            if (!requester) {
+                throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
+            }
 
-            return { user, accessToken: await this.signToken(user) };
-        }
-
-        if (!requester) {
-            throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
-        }
-
-        if (requester.isAdmin) {
-            const hash = await argon2.hash(password);
-            const user = await this.usersService.create({
-                username,
-                firstName,
-                middleName,
-                lastName,
-                email,
-                password: hash,
-                isAdmin: false,
-            });
-
-            return { user, accessToken: await this.signToken(user) };
-        }
-
-        const owned = await this.permissionsService.getUserPermissions(requester.id);
-        if (!owned.has('users.create')) {
-            throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
+            if (!requester.isAdmin) {
+                const owned = await this.permissionsService.getUserPermissions(requester.id);
+                if (!owned.has('users.create')) {
+                    throw new ForbiddenException('Apenas administradores ou usuários com permissão users.create podem cadastrar novos usuários');
+                }
+            }
         }
 
         const hash = await argon2.hash(password);
@@ -88,8 +65,9 @@ export class AuthService {
             middleName,
             lastName,
             email,
+            circuitoId,
             password: hash,
-            isAdmin: false,
+            isAdmin,
         });
 
         return { user, accessToken: await this.signToken(user) };

@@ -73,7 +73,7 @@ POST /auth/login
 GET  /auth/me
 ```
 
-O cadastro exige `username`, `firstName`, `lastName` e `password`; `middleName` e `email` são opcionais.
+O cadastro exige `username`, `firstName`, `lastName` e `password`; `middleName`, `email` e `circuitoId` são opcionais.
 
 ## Rotas
 

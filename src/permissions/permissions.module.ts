@@ -5,11 +5,12 @@ import { PermissionsSync } from './permissions-sync.service';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { UserPermissionsController } from './user-permissions.controller';
 import { DbModule } from '../db/db.module';
+import { PermissionsController } from './permissions.controller';
 
 @Global()
 @Module({
   imports: [DbModule, AuthModule],
-  controllers: [UserPermissionsController],
+  controllers: [UserPermissionsController, PermissionsController],
   providers: [PermissionsService, PermissionsSync, PermissionsGuard],
   exports: [PermissionsService, PermissionsGuard],
 })

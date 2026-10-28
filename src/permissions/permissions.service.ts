@@ -3,7 +3,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
 import { permissions, userPermissions, users } from '../db/schema';
-import { allPermissions, Permission } from './permissions.registry';
+import { allPermissions, Permission, PERMISSIONS } from './permissions.registry';
 
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -150,5 +150,11 @@ export class PermissionsService {
           inArray(userPermissions.permissionId, permissionIds),
         ),
       );
+  }
+  async getPermissions() {
+    return Object.entries(PERMISSIONS).map(([group, action]) => ({
+      category: group,
+      permissions: action.map((action) => `${group}.${action}`)
+    }))
   }
 }

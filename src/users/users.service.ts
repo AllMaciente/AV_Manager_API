@@ -1,9 +1,9 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { and, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, eq, ilike, or, sql } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
-import { circuito, users } from '../db/schema';
+import { circuito, equipamentos, userEquipamentos, users } from '../db/schema';
 import type { ListUsersQueryDto } from './users.schemas';
 
 export type CreateUserData = {
@@ -183,5 +183,18 @@ export class UsersService {
                 circuitoId: users.circuitoId,
             });
         return user;
+    }
+    async findEquipamentos(userId: string) {
+        return this.db
+            .select({
+                id: equipamentos.id,
+                name: equipamentos.name,
+                ordem: userEquipamentos.ordem,
+                sabeOperar: userEquipamentos.sabeOperar,
+            })
+            .from(userEquipamentos)
+            .innerJoin(equipamentos, eq(userEquipamentos.equipamentoId, equipamentos.id))
+            .where(eq(userEquipamentos.userId, userId))
+            .orderBy(asc(userEquipamentos.ordem));
     }
 }

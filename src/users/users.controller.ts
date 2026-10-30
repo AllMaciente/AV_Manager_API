@@ -1,9 +1,10 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
     ApiBearerAuth,
     ApiForbiddenResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
     ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse,
@@ -16,13 +17,17 @@ import { errorSchema, userListResponseSchema } from '../swagger/schemas';
 import { listUsersQuerySchema } from './users.schemas';
 import type { ListUsersQueryDto } from './users.schemas';
 import { UsersService } from './users.service';
+import { EquipamentosService } from 'src/equipamentos/equipamentos.service';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-    constructor(private users: UsersService) { }
+    constructor(
+        private users: UsersService,
+        private equipamento: EquipamentosService
+    ) { }
 
     @Get()
     @RequirePermissions('users.view')
@@ -75,5 +80,17 @@ export class UsersController {
         @Query(new ZodValidationPipe(listUsersQuerySchema)) query: ListUsersQueryDto,
     ) {
         return this.users.findAll(query);
+    }
+
+    @Get(':id/equipamentos')
+    @ApiParam({
+        name: 'id',
+        description: 'ID do usuário',
+        example: 'V1StGXR8_Z5j',
+    })
+    @RequirePermissions('users.view')
+    @UseGuards(PermissionsGuard)
+    operators(@Param('id') id: string) {
+        return this.equipamento.findEquipamentos(id)
     }
 }

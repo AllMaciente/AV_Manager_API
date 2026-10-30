@@ -1,4 +1,4 @@
-import { pgTable, varchar, primaryKey, smallint } from 'drizzle-orm/pg-core'
+import { pgTable, varchar, primaryKey } from 'drizzle-orm/pg-core'
 import { users } from "./users";
 import { permissions } from "./permissions";
 
@@ -8,7 +8,7 @@ export const userPermissions = pgTable(
         userId: varchar('user_id', { length: 12 })
             .notNull()
             .references(() => users.id, { onDelete: 'cascade' }),
-        permissionId: smallint('permission_id')
+        permissionId: varchar('permission_id', { length: 12 })
             .notNull()
             .references(() => permissions.id, { onDelete: 'cascade' }),
     },

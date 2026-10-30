@@ -1,0 +1,64 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "67feaf4b-2488-482e-97a8-3292fcf978ab",
+  "prevIds": [
+    "0e76d593-4ab9-4ed1-96c1-ff11f4572ab8"
+  ],
+  "footprints": [
+    {
+      "statementType": "alter_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "permissions",
+        "id"
+      ],
+      "writes": [
+        "s|colprop|public.permissions.id.type",
+        "s|colprop|public.permissions.id.default"
+      ],
+      "reads": [
+        "n|tbl|public.permissions",
+        "n|sch|public",
+        "n|col|public.permissions.id"
+      ]
+    },
+    {
+      "statementType": "alter_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "user_permissions",
+        "permission_id"
+      ],
+      "writes": [
+        "s|colprop|public.user_permissions.permission_id.type",
+        "s|colprop|public.user_permissions.permission_id.default"
+      ],
+      "reads": [
+        "n|tbl|public.user_permissions",
+        "n|sch|public",
+        "n|col|public.user_permissions.permission_id"
+      ],
+      "sqlHash": "d4a3772cc986adee"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"permissions\",\"id\"]",
+      "set": {
+        "type": "varchar(12)"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"user_permissions\",\"permission_id\"]",
+      "set": {
+        "type": "varchar(12)"
+      }
+    }
+  ]
+}

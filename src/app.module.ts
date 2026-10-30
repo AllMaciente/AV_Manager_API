@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CircuitosModule } from './circuitos/circuitos.module';
+import { EquipamentosModule } from './equipamentos/equipamentos.module';
 
 @Module({
-  imports: [DbModule, UsersModule, AuthModule, PermissionsModule, CircuitosModule],
+  imports: [DbModule, UsersModule, AuthModule, PermissionsModule, CircuitosModule, EquipamentosModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -4,3 +4,4 @@ export * from './permissions';
 export * from './users';
 export * from './userPermissions';
 export * from './userEquipamentos';
+export * from './events'

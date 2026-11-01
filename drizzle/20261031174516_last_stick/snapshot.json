@@ -1,0 +1,1024 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "9b0766f8-56d6-4cfc-afe8-9f2096cb610a",
+  "prevIds": [
+    "67feaf4b-2488-482e-97a8-3292fcf978ab"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "period"
+      ],
+      "writes": [
+        "s|enum|public.period",
+        "n|enum|public.period",
+        "e|enum|public.period",
+        "n|type|public.period"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "equipamentos"
+      ],
+      "writes": [
+        "s|tbl|public.equipamentos",
+        "n|tbl|public.equipamentos",
+        "e|tbl|public.equipamentos",
+        "n|rel|public.equipamentos",
+        "n|type|public.equipamentos",
+        "n|rel|public.equipamentos_pkey",
+        "n|rel|public.equipamentos_name_key"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_equipamentos"
+      ],
+      "writes": [
+        "s|tbl|public.user_equipamentos",
+        "n|tbl|public.user_equipamentos",
+        "e|tbl|public.user_equipamentos",
+        "n|rel|public.user_equipamentos",
+        "n|type|public.user_equipamentos",
+        "n|rel|public.user_equipamentos_pkey",
+        "n|rel|public.user_equipamentos_user_id_equipamento_id_unique"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "event"
+      ],
+      "writes": [
+        "s|tbl|public.event",
+        "n|tbl|public.event",
+        "e|tbl|public.event",
+        "n|rel|public.event",
+        "n|type|public.event",
+        "n|rel|public.event_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "eventCircuit"
+      ],
+      "writes": [
+        "s|tbl|public.eventCircuit",
+        "n|tbl|public.eventCircuit",
+        "e|tbl|public.eventCircuit",
+        "n|rel|public.eventCircuit",
+        "n|type|public.eventCircuit",
+        "n|rel|public.eventCircuit_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "event_day"
+      ],
+      "writes": [
+        "s|tbl|public.event_day",
+        "n|tbl|public.event_day",
+        "e|tbl|public.event_day",
+        "n|rel|public.event_day",
+        "n|type|public.event_day",
+        "n|rel|public.event_day_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "roster"
+      ],
+      "writes": [
+        "s|tbl|public.roster",
+        "n|tbl|public.roster",
+        "e|tbl|public.roster",
+        "n|rel|public.roster",
+        "n|type|public.roster",
+        "n|rel|public.roster_pkey",
+        "n|rel|public.roster_event_id_date_period_user_id_unique"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.period"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_equipamentos"
+      ],
+      "writes": [
+        "s|fk|public.user_equipamentos.user_equipamentos_user_id_users_id_fkey",
+        "n|fk|public.user_equipamentos.user_equipamentos_user_id_users_id_fkey",
+        "e|fk|public.user_equipamentos.user_equipamentos_user_id_users_id_fkey",
+        "n|con|public.user_equipamentos.user_equipamentos_user_id_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.user_equipamentos",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.user_equipamentos.user_id",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "user_equipamentos"
+      ],
+      "writes": [
+        "s|fk|public.user_equipamentos.user_equipamentos_equipamento_id_equipamentos_id_fkey",
+        "n|fk|public.user_equipamentos.user_equipamentos_equipamento_id_equipamentos_id_fkey",
+        "e|fk|public.user_equipamentos.user_equipamentos_equipamento_id_equipamentos_id_fkey",
+        "n|con|public.user_equipamentos.user_equipamentos_equipamento_id_equipamentos_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.user_equipamentos",
+        "n|sch|public",
+        "n|tbl|public.equipamentos",
+        "n|sch|public",
+        "n|col|public.user_equipamentos.equipamento_id",
+        "n|col|public.equipamentos.id",
+        "e|uniqueness|public.equipamentos.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "eventCircuit"
+      ],
+      "writes": [
+        "s|fk|public.eventCircuit.eventCircuit_event_id_event_id_fkey",
+        "n|fk|public.eventCircuit.eventCircuit_event_id_event_id_fkey",
+        "e|fk|public.eventCircuit.eventCircuit_event_id_event_id_fkey",
+        "n|con|public.eventCircuit.eventCircuit_event_id_event_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.eventCircuit",
+        "n|sch|public",
+        "n|tbl|public.event",
+        "n|sch|public",
+        "n|col|public.eventCircuit.event_id",
+        "n|col|public.event.id",
+        "e|uniqueness|public.event.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "eventCircuit"
+      ],
+      "writes": [
+        "s|fk|public.eventCircuit.eventCircuit_circuit_id_circuito_id_fkey",
+        "n|fk|public.eventCircuit.eventCircuit_circuit_id_circuito_id_fkey",
+        "e|fk|public.eventCircuit.eventCircuit_circuit_id_circuito_id_fkey",
+        "n|con|public.eventCircuit.eventCircuit_circuit_id_circuito_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.eventCircuit",
+        "n|sch|public",
+        "n|tbl|public.circuito",
+        "n|sch|public",
+        "n|col|public.eventCircuit.circuit_id",
+        "n|col|public.circuito.id",
+        "e|uniqueness|public.circuito.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "event_day"
+      ],
+      "writes": [
+        "s|fk|public.event_day.event_day_event_id_event_id_fkey",
+        "n|fk|public.event_day.event_day_event_id_event_id_fkey",
+        "e|fk|public.event_day.event_day_event_id_event_id_fkey",
+        "n|con|public.event_day.event_day_event_id_event_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.event_day",
+        "n|sch|public",
+        "n|tbl|public.event",
+        "n|sch|public",
+        "n|col|public.event_day.event_id",
+        "n|col|public.event.id",
+        "e|uniqueness|public.event.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "roster"
+      ],
+      "writes": [
+        "s|fk|public.roster.roster_equipamento_id_equipamentos_id_fkey",
+        "n|fk|public.roster.roster_equipamento_id_equipamentos_id_fkey",
+        "e|fk|public.roster.roster_equipamento_id_equipamentos_id_fkey",
+        "n|con|public.roster.roster_equipamento_id_equipamentos_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.roster",
+        "n|sch|public",
+        "n|tbl|public.equipamentos",
+        "n|sch|public",
+        "n|col|public.roster.equipamento_id",
+        "n|col|public.equipamentos.id",
+        "e|uniqueness|public.equipamentos.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "roster"
+      ],
+      "writes": [
+        "s|fk|public.roster.roster_user_id_users_id_fkey",
+        "n|fk|public.roster.roster_user_id_users_id_fkey",
+        "e|fk|public.roster.roster_user_id_users_id_fkey",
+        "n|con|public.roster.roster_user_id_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.roster",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.roster.user_id",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "roster"
+      ],
+      "writes": [
+        "s|fk|public.roster.roster_event_id_date_event_day_event_id_date_fkey",
+        "n|fk|public.roster.roster_event_id_date_event_day_event_id_date_fkey",
+        "e|fk|public.roster.roster_event_id_date_event_day_event_id_date_fkey",
+        "n|con|public.roster.roster_event_id_date_event_day_event_id_date_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.roster",
+        "n|sch|public",
+        "n|tbl|public.event_day",
+        "n|sch|public",
+        "n|col|public.roster.event_id",
+        "n|col|public.roster.date",
+        "n|col|public.event_day.event_id",
+        "n|col|public.event_day.date",
+        "e|uniqueness|public.event_day.date.event_id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "equipamentos",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "user_equipamentos",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "event",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "eventCircuit",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "event_day",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "roster",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "period",
+        "values": [
+          "MORNING",
+          "AFTERNOON"
+        ],
+        "entityType": "enums"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "equipamentos",
+        "name": "id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "equipamentos",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "user_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "equipamento_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "ordem",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "sabe_operar",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "true",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event",
+        "name": "id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "eventCircuit",
+        "name": "event_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "eventCircuit",
+        "name": "circuit_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_day",
+        "name": "event_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_day",
+        "name": "date",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_day",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "event_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "date",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "period",
+        "type": "period",
+        "typeSchema": "public",
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "equipamento_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "user_id",
+        "type": "varchar(12)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "user_equipamentos_user_id_users_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "user_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "user_equipamentos_equipamento_id_equipamentos_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "equipamento_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "equipamentos",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "eventCircuit",
+        "name": "eventCircuit_event_id_event_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "event_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "event",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "eventCircuit",
+        "name": "eventCircuit_circuit_id_circuito_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "circuit_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "circuito",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_day",
+        "name": "event_day_event_id_event_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "event_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "event",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "roster_equipamento_id_equipamentos_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "equipamento_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "equipamentos",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "roster_user_id_users_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "user_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "roster_event_id_date_event_day_event_id_date_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "event_id",
+          "date"
+        ],
+        "schemaTo": "public",
+        "tableTo": "event_day",
+        "columnsTo": [
+          "event_id",
+          "date"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "eventCircuit",
+        "name": "eventCircuit_pkey",
+        "columns": [
+          "circuit_id",
+          "event_id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_day",
+        "name": "event_day_pkey",
+        "columns": [
+          "event_id",
+          "date"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "equipamentos",
+        "name": "equipamentos_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "user_equipamentos_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event",
+        "name": "event_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "roster_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_equipamentos",
+        "name": "user_equipamentos_user_id_equipamento_id_unique",
+        "nameExplicit": false,
+        "columns": [
+          "user_id",
+          "equipamento_id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "roster",
+        "name": "roster_event_id_date_period_user_id_unique",
+        "nameExplicit": false,
+        "columns": [
+          "event_id",
+          "date",
+          "period",
+          "user_id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "equipamentos",
+        "name": "equipamentos_name_key",
+        "nameExplicit": false,
+        "columns": [
+          "name"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    }
+  ]
+}

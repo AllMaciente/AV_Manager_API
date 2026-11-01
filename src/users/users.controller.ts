@@ -13,7 +13,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { RequirePermissions } from '../permissions/decorators/require-permissions.decorator';
 import { PermissionsGuard } from '../permissions/guards/permissions.guard';
-import { errorSchema, userListResponseSchema } from '../swagger/schemas';
+import {
+    errorSchema,
+    userEquipamentoListSchema,
+    userListResponseSchema,
+} from '../swagger/schemas';
 import { listUsersQuerySchema } from './users.schemas';
 import type { ListUsersQueryDto } from './users.schemas';
 import { UsersService } from './users.service';
@@ -83,6 +87,11 @@ export class UsersController {
     }
 
     @Get(':id/equipamentos')
+    @ApiOperation({
+        summary: 'Listar equipamentos de um usuário',
+        description:
+            'Lista os equipamentos vinculados ao usuário, na ordem definida, com a indicação de que ele sabe operá-los. Requer a permissão users.view.',
+    })
     @ApiParam({
         name: 'id',
         description: 'ID do usuário',
@@ -90,6 +99,15 @@ export class UsersController {
     })
     @RequirePermissions('users.view')
     @UseGuards(PermissionsGuard)
+    @ApiOkResponse({
+        description: 'Equipamentos vinculados ao usuário',
+        schema: userEquipamentoListSchema,
+    })
+    @ApiForbiddenResponse({
+        description: 'Sem permissão users.view',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
     operators(@Param('id') id: string) {
         return this.equipamento.findEquipamentos(id)
     }

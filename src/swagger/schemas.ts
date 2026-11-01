@@ -270,6 +270,114 @@ export const setPermissionsBodySchema: SchemaObject = {
 export const patternQueryDescription =
   'Filtro por chave exata ou com curinga. Ex.: circuito.edit, circuito.*, users.*, *';
 
+export const permissionCatalogSchema: SchemaObject = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      category: { type: 'string', example: 'circuito' },
+      permissions: {
+        type: 'array',
+        items: { type: 'string' },
+        example: ['circuito.create', 'circuito.edit'],
+      },
+    },
+    required: ['category', 'permissions'],
+  },
+};
+
+const equipamentoProperties: Record<string, SchemaObject> = {
+  id: { type: 'string', example: 'Aw_M6jP36B8F' },
+  name: { type: 'string', example: 'Mesa de Som' },
+};
+
+export const equipamentoResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: equipamentoProperties,
+  required: ['id', 'name'],
+};
+
+export const equipamentoListSchema: SchemaObject = {
+  type: 'array',
+  items: equipamentoResponseSchema,
+};
+
+export const equipamentoBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    name: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 100,
+      example: 'Mesa de Som',
+    },
+  },
+  required: ['name'],
+};
+
+export const equipamentoUserSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    ...userSummaryProperties,
+    ordem: { type: 'integer', example: 1 },
+    sabeOperar: { type: 'boolean', example: true },
+  },
+  required: ['id', 'username', 'firstName', 'lastName', 'ordem', 'sabeOperar'],
+};
+
+export const equipamentoUserListSchema: SchemaObject = {
+  type: 'array',
+  items: equipamentoUserSchema,
+};
+
+export const userEquipamentoSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', example: 'Aw_M6jP36B8F' },
+    name: { type: 'string', example: 'Mesa de Som' },
+    ordem: { type: 'integer', example: 1 },
+    sabeOperar: { type: 'boolean', example: true },
+  },
+  required: ['id', 'name', 'ordem', 'sabeOperar'],
+};
+
+export const userEquipamentoListSchema: SchemaObject = {
+  type: 'array',
+  items: userEquipamentoSchema,
+};
+
+export const userEquipamentoLinkSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', example: 'V1StGXR8_Z5j' },
+    userId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    equipamentoId: { type: 'string', example: 'Aw_M6jP36B8F' },
+    ordem: { type: 'integer', example: 1 },
+    sabeOperar: { type: 'boolean', example: true },
+  },
+  required: ['id', 'userId', 'equipamentoId', 'ordem', 'sabeOperar'],
+};
+
+export const setEquipamentoOrderBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    equipamentoIds: {
+      type: 'array',
+      items: { type: 'string', minLength: 12, maxLength: 12 },
+      example: ['Aw_M6jP36B8F', 'V1StGXR8_Z5j'],
+      description: 'IDs dos equipamentos na ordem desejada',
+    },
+    removerAusentes: {
+      type: 'boolean',
+      default: true,
+      example: true,
+      description:
+        'Remove os equipamentos do usuário que não estiverem na lista (padrão true)',
+    },
+  },
+  required: ['equipamentoIds'],
+};
+
 const eventSummaryProperties: Record<string, SchemaObject> = {
   id: { type: 'string', example: 'V1StGXR8_Z5j' },
   name: { type: 'string', example: 'Culto de Domingo' },

@@ -1,11 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq, ilike, sql } from 'drizzle-orm';
+import { eq, ilike, sql } from 'drizzle-orm';
 import { DRIZZLE } from 'src/db/db.module';
 import { event, eventCircuit } from 'src/db/schema';
 
 import type { DB } from 'src/db/db.module';
 import type { EventDto, listEventsQueryDto } from '../schemas/event.schema';
-import type { SQL } from 'drizzle-orm';
 
 
 @Injectable()
@@ -13,19 +12,12 @@ export class EventService {
     constructor(@Inject(DRIZZLE) private db: DB) { }
 
     async findAllEvents({ search, page, limit }: listEventsQueryDto) {
-        const conditions: SQL[] = [];
+        const term = search ? `%${search}%` : undefined;
 
-        if (search) {
-            const term = `%${search}%`;
-            conditions.push(ilike(event.name, term));
-        }
-
-        const where = conditions.length ? and(...conditions) : undefined;
-
-        // 2. Executar a busca dos itens paginados e a contagem total em paralelo
+        // Executar a busca dos itens paginados e a contagem total em paralelo
         const [items, totalResult] = await Promise.all([
             this.db.query.event.findMany({
-                where: where ? { RAW: where } : undefined,
+                ...(term ? { where: { name: { ilike: term } } } : {}),
                 with: {
                     eventCircuits: {
                         with: { circuit: true }
@@ -43,7 +35,7 @@ export class EventService {
             this.db
                 .select({ count: sql<number>`count(*)` })
                 .from(event)
-                .where(where),
+                .where(term ? ilike(event.name, term) : undefined),
         ]);
 
         const total = Number(totalResult[0]?.count ?? 0);

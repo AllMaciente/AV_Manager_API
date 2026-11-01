@@ -57,61 +57,6 @@ Com a API no ar:
 
 Use o botão **Authorize** e informe o `accessToken` retornado pelo login para testar as rotas protegidas.
 
-## Health check
-
-```http
-GET /ping
-```
-
-Resposta: `pong`.
-
-## Autenticação
-
-```http
-POST /auth/register
-POST /auth/login
-GET  /auth/me
-```
-
-O cadastro exige `username`, `firstName`, `lastName` e `password`; `middleName`, `email` e `circuitoId` são opcionais.
-
-## Rotas
-
-### Circuitos
-
-| Método | Rota | Permissão |
-| --- | --- | --- |
-| GET | `/circuitos` | autenticado |
-| GET | `/circuitos/:id` | autenticado |
-| GET | `/circuitos/:id/users` | autenticado |
-| POST | `/circuitos` | `circuito.create` |
-| PATCH | `/circuitos/:id` | `circuito.edit` |
-| PATCH | `/circuitos/:id/users/:userId` | `circuito.edit` |
-
-### Usuários e permissões
-
-| Método | Rota | Permissão |
-| --- | --- | --- |
-| GET | `/users` | `users.view` |
-| GET | `/users/me/permissions` | autenticado |
-| GET | `/users/:userId/permissions` | `users.viewPerm` |
-| PUT | `/users/me/permissions` | `users.setPerm` |
-| PUT | `/users/:userId/permissions` | `users.setPerm` |
-
-A listagem de usuários aceita os query params `search` (username, nome ou email), `circuitoId`, `isAdmin`, `page` e `limit`:
-
-```http
-GET /users?circuitoId=Aw_M6jP36B8F&search=joao&page=1&limit=20
-```
-
-As rotas de leitura aceitam o query param `pattern` para filtrar chaves exatas ou por curinga:
-
-```http
-GET /users/me/permissions?pattern=circuito.*
-```
-
-Usuários com `is_admin` têm acesso total, independentemente das permissões atribuídas.
-
 ## Estrutura
 
 ```
@@ -130,6 +75,4 @@ drizzle/         migrations geradas pelo drizzle-kit
 ```bash
 npm run build       # compila para dist/
 npm run start:dev   # servidor com reload
-npm run test        # testes unitários
-npm run test:e2e    # testes end-to-end
 ```

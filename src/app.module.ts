@@ -7,9 +7,10 @@ import { UsersModule } from './users/users.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CircuitosModule } from './circuitos/circuitos.module';
 import { EquipamentosModule } from './equipamentos/equipamentos.module';
+import { EventModule } from './event/event.module';
 
 @Module({
-  imports: [DbModule, UsersModule, AuthModule, PermissionsModule, CircuitosModule, EquipamentosModule],
+  imports: [DbModule, UsersModule, AuthModule, PermissionsModule, CircuitosModule, EquipamentosModule, EventModule],
   controllers: [AppController],
   providers: [AppService],
 })

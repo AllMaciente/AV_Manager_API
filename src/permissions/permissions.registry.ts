@@ -1,7 +1,9 @@
 export const PERMISSIONS = {
   users: ['view', 'create', 'edit', 'setPerm', 'viewPerm'],
   circuito: ['create', 'edit'],
-  equipamentos: ['create', 'edit']
+  equipamentos: ['create', 'edit', 'setOrder'],
+  event: ['create', 'edit'],
+  roster: ['create', 'edit'],
 } as const;
 
 type Groups = typeof PERMISSIONS;

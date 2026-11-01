@@ -269,3 +269,308 @@ export const setPermissionsBodySchema: SchemaObject = {
 
 export const patternQueryDescription =
   'Filtro por chave exata ou com curinga. Ex.: circuito.edit, circuito.*, users.*, *';
+
+const eventSummaryProperties: Record<string, SchemaObject> = {
+  id: { type: 'string', example: 'V1StGXR8_Z5j' },
+  name: { type: 'string', example: 'Culto de Domingo' },
+  description: {
+    type: 'string',
+    nullable: true,
+    example: 'Culto dominical da manhã',
+  },
+};
+
+export const eventSummarySchema: SchemaObject = {
+  type: 'object',
+  properties: eventSummaryProperties,
+  required: ['id', 'name'],
+};
+
+export const eventDayResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    date: { type: 'string', format: 'date', example: '2026-11-01' },
+    description: {
+      type: 'string',
+      nullable: true,
+      example: 'Domingo pela manhã',
+    },
+  },
+  required: ['eventId', 'date'],
+};
+
+export const eventCircuitWithCircuitSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    circuitId: { type: 'string', example: 'Aw_M6jP36B8F' },
+    circuit: circuitoResponseSchema,
+  },
+  required: ['eventId', 'circuitId'],
+};
+
+export const eventCircuitWithEventSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    circuitId: { type: 'string', example: 'Aw_M6jP36B8F' },
+    event: eventSummarySchema,
+  },
+  required: ['eventId', 'circuitId'],
+};
+
+export const eventCircuitResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    circuitId: { type: 'string', example: 'Aw_M6jP36B8F' },
+    event: eventSummarySchema,
+    circuit: circuitoResponseSchema,
+  },
+  required: ['eventId', 'circuitId'],
+};
+
+export const eventCircuitLinkSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    circuitId: { type: 'string', example: 'Aw_M6jP36B8F' },
+  },
+  required: ['eventId', 'circuitId'],
+};
+
+export const eventResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    ...eventSummaryProperties,
+    eventCircuits: {
+      type: 'array',
+      items: eventCircuitWithCircuitSchema,
+    },
+    days: {
+      type: 'array',
+      items: eventDayResponseSchema,
+    },
+  },
+  required: ['id', 'name'],
+};
+
+export const eventListResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    items: { type: 'array', items: eventResponseSchema },
+    total: { type: 'integer', example: 42 },
+    page: { type: 'integer', example: 1 },
+    limit: { type: 'integer', example: 20 },
+    totalPages: { type: 'integer', example: 3 },
+  },
+  required: ['items', 'total', 'page', 'limit', 'totalPages'],
+};
+
+export const eventBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    name: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 200,
+      example: 'Culto de Domingo',
+    },
+    description: {
+      type: 'string',
+      nullable: true,
+      example: 'Culto dominical da manhã',
+      description: 'Opcional',
+    },
+    circuitoId: {
+      type: 'array',
+      items: { type: 'string', minLength: 12, maxLength: 12 },
+      example: ['Aw_M6jP36B8F'],
+      description: 'IDs dos circuitos vinculados ao evento (opcional)',
+    },
+  },
+  required: ['name'],
+};
+
+export const eventCircuitBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    circuitId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'Aw_M6jP36B8F',
+      description: 'ID do circuito que será vinculado ao evento',
+    },
+  },
+  required: ['circuitId'],
+};
+
+export const rosterResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', example: 'V1StGXR8_Z5j' },
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    date: { type: 'string', format: 'date', example: '2026-11-01' },
+    period: {
+      type: 'string',
+      enum: ['MORNING', 'AFTERNOON'],
+      example: 'MORNING',
+    },
+    equipamentoId: { type: 'string', example: 'Aw_M6jP36B8F' },
+    userId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    eventDay: eventDayResponseSchema,
+    equipamento: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', example: 'Aw_M6jP36B8F' },
+        name: { type: 'string', example: 'Mesa de Som' },
+      },
+      required: ['id', 'name'],
+    },
+    user: userSummarySchema,
+  },
+  required: ['id', 'eventId', 'date', 'period', 'equipamentoId', 'userId'],
+};
+
+export const eventDayWithRostersSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: { type: 'string', example: 'V1StGXR8_Z5j' },
+    date: { type: 'string', format: 'date', example: '2026-11-01' },
+    description: {
+      type: 'string',
+      nullable: true,
+      example: 'Domingo pela manhã',
+    },
+    rosters: {
+      type: 'array',
+      items: rosterResponseSchema,
+    },
+  },
+  required: ['eventId', 'date'],
+};
+
+export const eventDayListSchema: SchemaObject = {
+  type: 'array',
+  items: eventDayWithRostersSchema,
+};
+
+export const eventDayBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    date: {
+      type: 'string',
+      format: 'date',
+      example: '2026-11-01',
+    },
+    description: {
+      type: 'string',
+      nullable: true,
+      example: 'Domingo pela manhã',
+      description: 'Opcional',
+    },
+  },
+  required: ['date'],
+};
+
+export const eventDayBatchBodySchema: SchemaObject = {
+  type: 'array',
+  minItems: 1,
+  items: eventDayBodySchema,
+};
+
+export const eventDayUpdateBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    description: {
+      type: 'string',
+      nullable: true,
+      example: 'Domingo pela manhã',
+      description: 'Opcional',
+    },
+  },
+};
+
+export const rosterListResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    items: { type: 'array', items: rosterResponseSchema },
+    total: { type: 'integer', example: 42 },
+    page: { type: 'integer', example: 1 },
+    limit: { type: 'integer', example: 20 },
+    totalPages: { type: 'integer', example: 3 },
+  },
+  required: ['items', 'total', 'page', 'limit', 'totalPages'],
+};
+
+export const rosterBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'V1StGXR8_Z5j',
+    },
+    date: {
+      type: 'string',
+      format: 'date',
+      example: '2026-11-01',
+    },
+    period: {
+      type: 'string',
+      enum: ['MORNING', 'AFTERNOON'],
+      example: 'MORNING',
+    },
+    equipamentoId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'Aw_M6jP36B8F',
+    },
+    userId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'V1StGXR8_Z5j',
+    },
+  },
+  required: ['eventId', 'date', 'period', 'equipamentoId', 'userId'],
+};
+
+export const rosterUpdateBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    eventId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'V1StGXR8_Z5j',
+    },
+    date: {
+      type: 'string',
+      format: 'date',
+      example: '2026-11-01',
+    },
+    period: {
+      type: 'string',
+      enum: ['MORNING', 'AFTERNOON'],
+      example: 'AFTERNOON',
+    },
+    equipamentoId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'Aw_M6jP36B8F',
+    },
+    userId: {
+      type: 'string',
+      minLength: 12,
+      maxLength: 12,
+      example: 'V1StGXR8_Z5j',
+    },
+  },
+  description: 'Informe ao menos um campo',
+};

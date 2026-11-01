@@ -380,11 +380,11 @@ export const setEquipamentoOrderBodySchema: SchemaObject = {
 
 const eventSummaryProperties: Record<string, SchemaObject> = {
   id: { type: 'string', example: 'V1StGXR8_Z5j' },
-  name: { type: 'string', example: 'Culto de Domingo' },
+  name: { type: 'string', example: 'congresso 2026' },
   description: {
     type: 'string',
     nullable: true,
-    example: 'Culto dominical da manhã',
+    example: 'congresso 2026',
   },
 };
 
@@ -402,7 +402,7 @@ export const eventDayResponseSchema: SchemaObject = {
     description: {
       type: 'string',
       nullable: true,
-      example: 'Domingo pela manhã',
+      example: 'Domingo',
     },
   },
   required: ['eventId', 'date'],
@@ -483,12 +483,12 @@ export const eventBodySchema: SchemaObject = {
       type: 'string',
       minLength: 1,
       maxLength: 200,
-      example: 'Culto de Domingo',
+      example: 'Congresso 2026',
     },
     description: {
       type: 'string',
       nullable: true,
-      example: 'Culto dominical da manhã',
+      example: 'congresso 2026',
       description: 'Opcional',
     },
     circuitoId: {
@@ -550,7 +550,7 @@ export const eventDayWithRostersSchema: SchemaObject = {
     description: {
       type: 'string',
       nullable: true,
-      example: 'Domingo pela manhã',
+      example: 'Domingo',
     },
     rosters: {
       type: 'array',
@@ -576,7 +576,7 @@ export const eventDayBodySchema: SchemaObject = {
     description: {
       type: 'string',
       nullable: true,
-      example: 'Domingo pela manhã',
+      example: 'Domingo',
       description: 'Opcional',
     },
   },
@@ -595,7 +595,7 @@ export const eventDayUpdateBodySchema: SchemaObject = {
     description: {
       type: 'string',
       nullable: true,
-      example: 'Domingo pela manhã',
+      example: 'Domingo',
       description: 'Opcional',
     },
   },

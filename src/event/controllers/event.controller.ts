@@ -60,7 +60,7 @@ export class EventController {
         name: 'search',
         required: false,
         description: 'Busca pelo nome do evento',
-        example: 'culto',
+        example: 'congresso',
     })
     @ApiQuery({
         name: 'page',

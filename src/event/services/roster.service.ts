@@ -45,15 +45,23 @@ export class RosterService {
     page,
     limit,
   }: listRostersQueryDto) {
-    const conditions: SQL[] = [];
+    const hasFilters = Boolean(
+      eventId || date || period || equipamentoId || userId,
+    );
 
-    if (eventId) conditions.push(eq(roster.eventId, eventId));
-    if (date) conditions.push(eq(roster.date, date));
-    if (period) conditions.push(eq(roster.period, period));
-    if (equipamentoId) conditions.push(eq(roster.equipamentoId, equipamentoId));
-    if (userId) conditions.push(eq(roster.userId, userId));
+    const buildWhere = (table: typeof roster) => {
+      const conditions: SQL[] = [];
 
-    return this.paginate(conditions.length ? and(...conditions) : undefined, {
+      if (eventId) conditions.push(eq(table.eventId, eventId));
+      if (date) conditions.push(eq(table.date, date));
+      if (period) conditions.push(eq(table.period, period));
+      if (equipamentoId) conditions.push(eq(table.equipamentoId, equipamentoId));
+      if (userId) conditions.push(eq(table.userId, userId));
+
+      return and(...conditions)!;
+    };
+
+    return this.paginate(hasFilters ? buildWhere : undefined, {
       page,
       limit,
     });
@@ -63,22 +71,26 @@ export class RosterService {
     userId: string,
     { includePast, page, limit }: listMyRostersQueryDto,
   ) {
-    const conditions: SQL[] = [eq(roster.userId, userId)];
+    const buildWhere = (table: typeof roster) => {
+      const conditions: SQL[] = [eq(table.userId, userId)];
 
-    if (!includePast) {
-      conditions.push(gte(roster.date, sql`current_date`));
-    }
+      if (!includePast) {
+        conditions.push(gte(table.date, sql`current_date`));
+      }
 
-    return this.paginate(and(...conditions), { page, limit });
+      return and(...conditions)!;
+    };
+
+    return this.paginate(buildWhere, { page, limit });
   }
 
   private async paginate(
-    where: SQL | undefined,
+    buildWhere: ((table: typeof roster) => SQL) | undefined,
     { page, limit }: { page: number; limit: number },
   ) {
     const [items, totalResult] = await Promise.all([
       this.db.query.roster.findMany({
-        where: where ? { RAW: where } : undefined,
+        ...(buildWhere ? { where: { RAW: buildWhere } } : {}),
         with: rosterRelations,
         orderBy: (r, { asc }) => [asc(r.date), asc(r.period), asc(r.id)],
         limit,
@@ -87,7 +99,7 @@ export class RosterService {
       this.db
         .select({ count: sql<number>`count(*)` })
         .from(roster)
-        .where(where),
+        .where(buildWhere ? buildWhere(roster) : undefined),
     ]);
 
     const total = Number(totalResult[0]?.count ?? 0);

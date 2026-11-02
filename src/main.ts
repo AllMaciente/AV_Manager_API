@@ -23,7 +23,13 @@ async function bootstrap() {
     .addTag('roster', 'Escalas de eventos')
     .build();
 
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = () => SwaggerModule.createDocument(app, config, {
+    operationIdFactory: (controllerKey: string, methodKey: string) => {
+      // Transforma "UsersController" em "Users" e junta com o método: "Users_findAll"
+      const cleanController = controllerKey.replace('Controller', '');
+      return `${cleanController}_${methodKey}`;
+    },
+  });
 
   SwaggerModule.setup('api', app, documentFactory, {
     customSiteTitle: 'AV Manager API',

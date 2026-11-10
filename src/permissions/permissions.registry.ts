@@ -1,5 +1,5 @@
 export const PERMISSIONS = {
-  users: ['view', 'create', 'edit', 'setPerm', 'viewPerm'],
+  users: ['view', 'create', 'edit', 'editPassword', 'setPerm', 'viewPerm'],
   circuito: ['create', 'edit'],
   equipamentos: ['create', 'edit', 'setOrder'],
   event: ['create', 'edit'],

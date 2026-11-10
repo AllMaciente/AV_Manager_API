@@ -1,5 +1,12 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, ilike, or, sql } from 'drizzle-orm';
+import {
+    BadRequestException,
+    ConflictException,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import * as argon2 from 'argon2';
+import { and, asc, eq, getTableColumns, ilike, ne, or, sql } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
@@ -15,6 +22,15 @@ export type CreateUserData = {
     password: string;
     isAdmin?: boolean;
     circuitoId?: string;
+};
+
+export type UpdateUserData = {
+    username?: string;
+    firstName?: string;
+    middleName?: string | null;
+    lastName?: string;
+    email?: string | null;
+    circuitoId?: string | null;
 };
 
 const userSummaryColumns = {
@@ -107,8 +123,10 @@ export class UsersService {
                 createdAt: users.createdAt,
                 isAdmin: users.isAdmin,
                 circuitoId: users.circuitoId,
+                circuitoName: circuito.name,
             })
             .from(users)
+            .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(eq(users.id, id))
             .limit(1);
         return user;
@@ -116,8 +134,12 @@ export class UsersService {
 
     async findByEmail(email: string) {
         const [user] = await this.db
-            .select()
+            .select({
+                ...getTableColumns(users),
+                circuitoName: circuito.name,
+            })
             .from(users)
+            .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(sql`lower(${users.email}) = lower(${email})`)
             .limit(1);
         return user;
@@ -125,8 +147,12 @@ export class UsersService {
 
     async findByUsername(username: string) {
         const [user] = await this.db
-            .select()
+            .select({
+                ...getTableColumns(users),
+                circuitoName: circuito.name,
+            })
             .from(users)
+            .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(sql`lower(${users.username}) = lower(${username})`)
             .limit(1);
         return user;
@@ -148,9 +174,11 @@ export class UsersService {
     }
 
     async create(data: CreateUserData) {
+        let circuitoName: string | null = null;
+
         if (data.circuitoId) {
             const [existingCircuito] = await this.db
-                .select({ id: circuito.id })
+                .select({ id: circuito.id, name: circuito.name })
                 .from(circuito)
                 .where(eq(circuito.id, data.circuitoId))
                 .limit(1);
@@ -158,6 +186,8 @@ export class UsersService {
             if (!existingCircuito) {
                 throw new BadRequestException('Circuito não encontrado');
             }
+
+            circuitoName = existingCircuito.name;
         }
 
         const [user] = await this.db
@@ -182,8 +212,126 @@ export class UsersService {
                 isAdmin: users.isAdmin,
                 circuitoId: users.circuitoId,
             });
-        return user;
+        return { ...user, circuitoName };
     }
+
+    async update(id: string, data: UpdateUserData) {
+        await this.ensureUserExists(id);
+        await this.ensureUniqueFields(id, data);
+
+        if (data.circuitoId) {
+            await this.ensureCircuitoExists(data.circuitoId);
+        }
+
+        await this.db.update(users).set(data).where(eq(users.id, id));
+
+        return this.findPublicById(id);
+    }
+
+    async changePassword(
+        id: string,
+        currentPassword: string,
+        newPassword: string,
+    ) {
+        const user = await this.findById(id);
+        if (!user) throw new NotFoundException('Usuário não encontrado');
+
+        const valid = await argon2.verify(user.password, currentPassword);
+        if (!valid) throw new BadRequestException('Senha atual incorreta');
+
+        await this.setPassword(id, newPassword);
+
+        return { message: 'Senha alterada com sucesso' };
+    }
+
+    async resetPassword(id: string, newPassword: string) {
+        await this.ensureUserExists(id);
+        await this.setPassword(id, newPassword);
+
+        return { message: 'Senha alterada com sucesso' };
+    }
+
+    async findPublicById(id: string) {
+        const user = await this.findById(id);
+        if (!user) throw new NotFoundException('Usuário não encontrado');
+
+        return {
+            id: user.id,
+            username: user.username,
+            firstName: user.firstName,
+            middleName: user.middleName,
+            lastName: user.lastName,
+            email: user.email,
+            emailVerifiedAt: user.emailVerifiedAt,
+            createdAt: user.createdAt,
+            isAdmin: user.isAdmin,
+            circuitoId: user.circuitoId,
+            circuitoName: user.circuitoName,
+        };
+    }
+
+    private async setPassword(id: string, newPassword: string) {
+        const hash = await argon2.hash(newPassword);
+        await this.db
+            .update(users)
+            .set({ password: hash })
+            .where(eq(users.id, id));
+    }
+
+    private async ensureUserExists(id: string) {
+        const [user] = await this.db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.id, id))
+            .limit(1);
+
+        if (!user) throw new NotFoundException('Usuário não encontrado');
+    }
+
+    private async ensureUniqueFields(id: string, data: UpdateUserData) {
+        if (data.username) {
+            const [existing] = await this.db
+                .select({ id: users.id })
+                .from(users)
+                .where(
+                    and(
+                        sql`lower(${users.username}) = lower(${data.username})`,
+                        ne(users.id, id),
+                    ),
+                )
+                .limit(1);
+
+            if (existing) throw new ConflictException('Username já cadastrado');
+        }
+
+        if (data.email) {
+            const [existing] = await this.db
+                .select({ id: users.id })
+                .from(users)
+                .where(
+                    and(
+                        sql`lower(${users.email}) = lower(${data.email})`,
+                        ne(users.id, id),
+                    ),
+                )
+                .limit(1);
+
+            if (existing) throw new ConflictException('Email já cadastrado');
+        }
+    }
+
+    private async ensureCircuitoExists(circuitoId: string) {
+        const [existing] = await this.db
+            .select({ id: circuito.id })
+            .from(circuito)
+            .where(eq(circuito.id, circuitoId))
+            .limit(1);
+
+        if (!existing) {
+            throw new BadRequestException('Circuito não encontrado');
+        }
+    }
+
     async findEquipamentos(userId: string) {
         return this.db
             .select({

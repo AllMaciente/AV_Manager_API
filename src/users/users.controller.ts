@@ -1,7 +1,20 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Patch,
+    Query,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
+import {
+    ApiBadRequestResponse,
     ApiBearerAuth,
+    ApiBody,
+    ApiConflictResponse,
     ApiForbiddenResponse,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
@@ -14,14 +27,36 @@ import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { RequirePermissions } from '../permissions/decorators/require-permissions.decorator';
 import { PermissionsGuard } from '../permissions/guards/permissions.guard';
 import {
+    changePasswordBodySchema,
     errorSchema,
+    messageResponseSchema,
+    resetPasswordBodySchema,
+    updateProfileBodySchema,
+    updateUserBodySchema,
     userEquipamentoListSchema,
     userListResponseSchema,
+    userProfileSchema,
 } from '../swagger/schemas';
-import { listUsersQuerySchema } from './users.schemas';
-import type { ListUsersQueryDto } from './users.schemas';
+import {
+    changePasswordSchema,
+    listUsersQuerySchema,
+    resetPasswordSchema,
+    updateProfileSchema,
+    updateUserSchema,
+} from './users.schemas';
+import type {
+    ChangePasswordDto,
+    ListUsersQueryDto,
+    ResetPasswordDto,
+    UpdateProfileDto,
+    UpdateUserDto,
+} from './users.schemas';
 import { UsersService } from './users.service';
 import { EquipamentosService } from 'src/equipamentos/equipamentos.service';
+
+type AuthenticatedRequest = {
+    user: { id: string };
+};
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -84,6 +119,125 @@ export class UsersController {
         @Query(new ZodValidationPipe(listUsersQuerySchema)) query: ListUsersQueryDto,
     ) {
         return this.users.findAll(query);
+    }
+
+    @Patch('me')
+    @ApiOperation({
+        summary: 'Atualizar o próprio perfil',
+        description:
+            'Atualiza os dados do usuário autenticado. Informe ao menos um campo. Campos opcionais como middleName e email podem ser removidos enviando null ou string vazia.',
+    })
+    @ApiBody({ schema: updateProfileBodySchema })
+    @ApiOkResponse({ description: 'Perfil atualizado', schema: userProfileSchema })
+    @ApiBadRequestResponse({ schema: errorSchema })
+    @ApiConflictResponse({
+        description: 'Username ou email já cadastrado',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
+    updateMe(
+        @Req() req: AuthenticatedRequest,
+        @Body(new ZodValidationPipe(updateProfileSchema)) body: UpdateProfileDto,
+    ) {
+        return this.users.update(req.user.id, body);
+    }
+
+    @Patch('me/password')
+    @ApiOperation({
+        summary: 'Alterar a própria senha',
+        description:
+            'Altera a senha do usuário autenticado. É necessário informar a senha atual e a nova senha.',
+    })
+    @ApiBody({ schema: changePasswordBodySchema })
+    @ApiOkResponse({
+        description: 'Senha alterada',
+        schema: messageResponseSchema,
+    })
+    @ApiBadRequestResponse({
+        description: 'Senha atual incorreta ou nova senha inválida',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
+    changeMyPassword(
+        @Req() req: AuthenticatedRequest,
+        @Body(new ZodValidationPipe(changePasswordSchema)) body: ChangePasswordDto,
+    ) {
+        return this.users.changePassword(
+            req.user.id,
+            body.currentPassword,
+            body.newPassword,
+        );
+    }
+
+    @Patch(':id')
+    @RequirePermissions('users.edit')
+    @UseGuards(PermissionsGuard)
+    @ApiOperation({
+        summary: 'Editar outro usuário',
+        description:
+            'Atualiza os dados de outro usuário. Requer a permissão users.edit. Informe ao menos um campo.',
+    })
+    @ApiParam({
+        name: 'id',
+        description: 'ID do usuário',
+        example: 'V1StGXR8_Z5j',
+    })
+    @ApiBody({ schema: updateUserBodySchema })
+    @ApiOkResponse({ description: 'Usuário atualizado', schema: userProfileSchema })
+    @ApiBadRequestResponse({ schema: errorSchema })
+    @ApiConflictResponse({
+        description: 'Username ou email já cadastrado',
+        schema: errorSchema,
+    })
+    @ApiForbiddenResponse({
+        description: 'Sem permissão users.edit',
+        schema: errorSchema,
+    })
+    @ApiNotFoundResponse({
+        description: 'Usuário não encontrado',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
+    update(
+        @Param('id') id: string,
+        @Body(new ZodValidationPipe(updateUserSchema)) body: UpdateUserDto,
+    ) {
+        return this.users.update(id, body);
+    }
+
+    @Patch(':id/password')
+    @RequirePermissions('users.editPassword')
+    @UseGuards(PermissionsGuard)
+    @ApiOperation({
+        summary: 'Redefinir a senha de outro usuário',
+        description:
+            'Define uma nova senha para outro usuário, sem exigir a senha atual. Requer a permissão users.editPassword.',
+    })
+    @ApiParam({
+        name: 'id',
+        description: 'ID do usuário',
+        example: 'V1StGXR8_Z5j',
+    })
+    @ApiBody({ schema: resetPasswordBodySchema })
+    @ApiOkResponse({
+        description: 'Senha alterada',
+        schema: messageResponseSchema,
+    })
+    @ApiBadRequestResponse({ schema: errorSchema })
+    @ApiForbiddenResponse({
+        description: 'Sem permissão users.editPassword',
+        schema: errorSchema,
+    })
+    @ApiNotFoundResponse({
+        description: 'Usuário não encontrado',
+        schema: errorSchema,
+    })
+    @ApiUnauthorizedResponse({ schema: errorSchema })
+    resetPassword(
+        @Param('id') id: string,
+        @Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordDto,
+    ) {
+        return this.users.resetPassword(id, body.newPassword);
     }
 
     @Get(':id/equipamentos')

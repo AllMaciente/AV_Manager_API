@@ -197,6 +197,122 @@ export const loginResponseSchema: SchemaObject = {
   required: ['accessToken'],
 };
 
+export const updateProfileBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    username: { type: 'string', minLength: 3, maxLength: 50, example: 'joao' },
+    firstName: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      example: 'João',
+    },
+    middleName: {
+      type: 'string',
+      maxLength: 50,
+      nullable: true,
+      example: 'da',
+      description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+    lastName: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      example: 'Silva',
+    },
+    email: {
+      type: 'string',
+      format: 'email',
+      nullable: true,
+      example: 'joao@example.com',
+      description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+  },
+  description: 'Informe ao menos um campo',
+};
+
+export const updateUserBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    username: { type: 'string', minLength: 3, maxLength: 50, example: 'joao' },
+    firstName: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      example: 'João',
+    },
+    middleName: {
+      type: 'string',
+      maxLength: 50,
+      nullable: true,
+      example: 'da',
+      description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+    lastName: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 50,
+      example: 'Silva',
+    },
+    email: {
+      type: 'string',
+      format: 'email',
+      nullable: true,
+      example: 'joao@example.com',
+      description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+    circuitoId: {
+      type: 'string',
+      nullable: true,
+      maxLength: 12,
+      example: 'Aw_M6jP36B8F',
+      description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+  },
+  description: 'Informe ao menos um campo',
+};
+
+export const changePasswordBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    currentPassword: {
+      type: 'string',
+      format: 'password',
+      example: 'senhaAtual123',
+    },
+    newPassword: {
+      type: 'string',
+      format: 'password',
+      minLength: 8,
+      maxLength: 128,
+      example: 'novaSenha123',
+    },
+  },
+  required: ['currentPassword', 'newPassword'],
+};
+
+export const resetPasswordBodySchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    newPassword: {
+      type: 'string',
+      format: 'password',
+      minLength: 8,
+      maxLength: 128,
+      example: 'novaSenha123',
+    },
+  },
+  required: ['newPassword'],
+};
+
+export const messageResponseSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    message: { type: 'string', example: 'Senha alterada com sucesso' },
+  },
+  required: ['message'],
+};
+
 const circuitoProperties: Record<string, SchemaObject> = {
   id: { type: 'string', example: 'Aw_M6jP36B8F' },
   name: { type: 'string', example: 'SC-004' },

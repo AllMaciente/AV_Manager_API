@@ -2,9 +2,34 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { DRIZZLE } from './db/db.module';
+import type { DB } from './db/db.module';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { join } from 'path';
+import { existsSync } from 'fs';
+
+function resolveMigrationsFolder(): string {
+  const candidates = [
+    join(__dirname, '..', 'drizzle'),
+    join(process.cwd(), 'drizzle'),
+    join(process.cwd(), 'dist', 'drizzle'),
+  ];
+
+  const folder = candidates.find((candidate) => existsSync(candidate));
+  if (!folder) {
+    throw new Error(
+      'Pasta de migrations não encontrada. Execute o build (npm run build) antes de iniciar.',
+    );
+  }
+
+  return folder;
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const db = app.get<DB>(DRIZZLE);
+  await migrate(db, { migrationsFolder: resolveMigrationsFolder() });
 
   const config = new DocumentBuilder()
     .setTitle('AV Manager API')

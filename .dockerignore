@@ -1,0 +1,39 @@
+# dependências e build (são gerados dentro da imagem)
+node_modules
+dist
+coverage
+.next
+.turbo
+
+# controle de versão
+.git
+.gitignore
+.gitattributes
+
+# docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# editor e sistema
+.vscode
+.idea
+.DS_Store
+*.swp
+
+# testes e docs (se não precisar na imagem)
+test
+**/*.spec.ts
+**/*.e2e-spec.ts
+README.md
+docs
+
+# arquivos de ambiente (veja a observação abaixo)
+.env.*
+!.env.example

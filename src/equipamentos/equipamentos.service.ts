@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
-import { equipamentos, userEquipamentos, users } from 'src/db/schema';
+import { equipamentos, circuito, userEquipamentos, users } from 'src/db/schema';
 import { and, asc, eq, inArray, notInArray, sql } from 'drizzle-orm';
 
 type EquipamentoData = {
@@ -56,11 +56,14 @@ export class EquipamentosService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                circuitoId: users.circuitoId,
+                circuitoName: circuito.name,
                 ordem: userEquipamentos.ordem,
                 sabeOperar: userEquipamentos.sabeOperar,
             })
             .from(userEquipamentos)
             .innerJoin(users, eq(userEquipamentos.userId, users.id))
+            .leftJoin(circuito, eq(circuito.id, users.circuitoId))
             .where(eq(userEquipamentos.equipamentoId, equipamentoId))
             .orderBy(asc(userEquipamentos.ordem));
     }

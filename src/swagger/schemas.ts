@@ -37,6 +37,7 @@ const userSummaryProperties: Record<string, SchemaObject> = {
     nullable: true,
     example: 'joao@example.com',
   },
+  circuitoName: { type: 'string', nullable: true, example: 'SC-004' },
 };
 
 export const userSummarySchema: SchemaObject = {
@@ -72,7 +73,6 @@ export const userListItemSchema: SchemaObject = {
     ...userSummaryProperties,
     isAdmin: { type: 'boolean', example: false },
     circuitoId: { type: 'string', nullable: true, example: 'Aw_M6jP36B8F' },
-    circuitoName: { type: 'string', nullable: true, example: 'SC-004' },
     createdAt: {
       type: 'string',
       format: 'date-time',

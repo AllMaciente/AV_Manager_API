@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { and, eq, gte, ne, sql } from 'drizzle-orm';
 import { DRIZZLE } from 'src/db/db.module';
-import { equipamentos, eventDay, roster, users } from 'src/db/schema';
+import { circuito, equipamentos, eventDay, roster, users } from 'src/db/schema';
 
 import type { SQL } from 'drizzle-orm';
 import type { DB } from 'src/db/db.module';
@@ -29,8 +29,16 @@ const rosterRelations = {
       lastName: true,
       email: true,
     },
+    extras: {
+      circuitoName: (table: typeof users) =>
+        sql<string | null>`(
+          select ${circuito.name}
+          from ${circuito}
+          where ${circuito.id} = ${table.circuitoId}
+        )`,
+    },
   },
-} as const;
+};
 
 @Injectable()
 export class RosterService {

@@ -57,13 +57,16 @@ export class CircuitosService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                circuitoId: users.circuitoId,
+                circuitoName: circuito.name,
             })
             .from(users)
+            .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(eq(users.circuitoId, circuitoId));
     }
 
     async assignUser(circuitoId: string, userId: string) {
-        await this.findById(circuitoId);
+        const found = await this.findById(circuitoId);
 
         const [user] = await this.db
             .update(users)
@@ -80,6 +83,6 @@ export class CircuitosService {
             });
 
         if (!user) throw new NotFoundException('Usuário não encontrado');
-        return user;
+        return { ...user, circuitoName: found.name };
     }
 }

@@ -175,7 +175,7 @@ export class UsersController {
     @ApiOperation({
         summary: 'Editar outro usuário',
         description:
-            'Atualiza os dados de outro usuário. Requer a permissão users.edit. Informe ao menos um campo.',
+            'Atualiza os dados de outro usuário, incluindo o circuito vinculado (circuitoId). Requer a permissão users.edit. Informe ao menos um campo. Envie circuitoId como null ou string vazia para remover o vínculo.',
     })
     @ApiParam({
         name: 'id',

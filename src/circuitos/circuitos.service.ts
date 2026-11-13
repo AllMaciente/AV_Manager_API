@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
 import { circuito, users } from '../db/schema';
+import { withResolvedAvatar } from '../users/avatar';
 
 type CircuitoData = {
     name: string;
@@ -49,7 +50,7 @@ export class CircuitosService {
     async findUsers(circuitoId: string) {
         await this.findById(circuitoId);
 
-        return this.db
+        const rows = await this.db
             .select({
                 id: users.id,
                 username: users.username,
@@ -57,12 +58,15 @@ export class CircuitosService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                avatarUrl: users.avatarUrl,
                 circuitoId: users.circuitoId,
                 circuitoName: circuito.name,
             })
             .from(users)
             .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(eq(users.circuitoId, circuitoId));
+
+        return rows.map(withResolvedAvatar);
     }
 
     async assignUser(circuitoId: string, userId: string) {
@@ -79,10 +83,11 @@ export class CircuitosService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                avatarUrl: users.avatarUrl,
                 circuitoId: users.circuitoId,
             });
 
         if (!user) throw new NotFoundException('Usuário não encontrado');
-        return { ...user, circuitoName: found.name };
+        return { ...withResolvedAvatar(user), circuitoName: found.name };
     }
 }

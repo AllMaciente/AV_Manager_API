@@ -7,6 +7,7 @@ import {
 import { and, eq, inArray } from 'drizzle-orm';
 import { DRIZZLE } from 'src/db/db.module';
 import { event, eventDay } from 'src/db/schema';
+import { withResolvedAvatar } from 'src/users/avatar';
 
 import type { DB } from 'src/db/db.module';
 import type {
@@ -25,9 +26,31 @@ const rosterRelations = {
       middleName: true,
       lastName: true,
       email: true,
+      avatarUrl: true,
     },
   },
 } as const;
+
+type DayWithRosterUsers = {
+  rosters: Array<{
+    user:
+      | {
+          firstName: string;
+          middleName: string | null;
+          lastName: string;
+          avatarUrl: string | null;
+        }
+      | null;
+  }>;
+};
+
+const withResolvedUsers = <T extends DayWithRosterUsers>(day: T) => ({
+  ...day,
+  rosters: day.rosters.map((item) => ({
+    ...item,
+    user: item.user ? withResolvedAvatar(item.user) : item.user,
+  })),
+});
 
 @Injectable()
 export class EventDayService {
@@ -36,13 +59,15 @@ export class EventDayService {
   async getDays(eventId: string) {
     await this.assertEventExists(eventId);
 
-    return this.db.query.eventDay.findMany({
+    const days = await this.db.query.eventDay.findMany({
       where: { eventId },
       with: {
         rosters: { with: rosterRelations },
       },
       orderBy: (d, { asc }) => [asc(d.date)],
     });
+
+    return days.map(withResolvedUsers);
   }
 
   async getDay(eventId: string, date: string) {
@@ -54,7 +79,7 @@ export class EventDayService {
     });
 
     if (!day) throw new NotFoundException('dia do evento não encontrado');
-    return day;
+    return withResolvedUsers(day);
   }
 
   async createOne(data: createEventDayDto) {

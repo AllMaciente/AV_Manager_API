@@ -3,6 +3,7 @@ import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
 import { equipamentos, circuito, userEquipamentos, users } from 'src/db/schema';
 import { and, asc, eq, inArray, notInArray, sql } from 'drizzle-orm';
+import { withResolvedAvatar } from '../users/avatar';
 
 type EquipamentoData = {
     name: string
@@ -48,7 +49,7 @@ export class EquipamentosService {
     async findUsers(equipamentoId: string) {
         await this.findById(equipamentoId);
 
-        return this.db
+        const rows = await this.db
             .select({
                 id: users.id,
                 username: users.username,
@@ -56,6 +57,7 @@ export class EquipamentosService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                avatarUrl: users.avatarUrl,
                 circuitoId: users.circuitoId,
                 circuitoName: circuito.name,
                 ordem: userEquipamentos.ordem,
@@ -66,6 +68,8 @@ export class EquipamentosService {
             .leftJoin(circuito, eq(circuito.id, users.circuitoId))
             .where(eq(userEquipamentos.equipamentoId, equipamentoId))
             .orderBy(asc(userEquipamentos.ordem));
+
+        return rows.map(withResolvedAvatar);
     }
 
     async addEquipamento(userId: string, equipamentoId: string, sabeOperar = true) {

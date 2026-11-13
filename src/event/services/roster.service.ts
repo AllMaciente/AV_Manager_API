@@ -7,6 +7,7 @@ import {
 import { and, eq, gte, ne, sql } from 'drizzle-orm';
 import { DRIZZLE } from 'src/db/db.module';
 import { circuito, equipamentos, eventDay, roster, users } from 'src/db/schema';
+import { withResolvedAvatar } from 'src/users/avatar';
 
 import type { SQL } from 'drizzle-orm';
 import type { DB } from 'src/db/db.module';
@@ -28,6 +29,7 @@ const rosterRelations = {
       middleName: true,
       lastName: true,
       email: true,
+      avatarUrl: true,
     },
     extras: {
       circuitoName: (table: typeof users) =>
@@ -38,7 +40,7 @@ const rosterRelations = {
         )`,
     },
   },
-};
+} as const;
 
 @Injectable()
 export class RosterService {
@@ -113,7 +115,10 @@ export class RosterService {
     const total = Number(totalResult[0]?.count ?? 0);
 
     return {
-      items,
+      items: items.map((item) => ({
+        ...item,
+        user: item.user ? withResolvedAvatar(item.user) : item.user,
+      })),
       total,
       page,
       limit,
@@ -128,7 +133,10 @@ export class RosterService {
     });
 
     if (!row) throw new NotFoundException('escala não encontrada');
-    return row;
+    return {
+      ...row,
+      user: row.user ? withResolvedAvatar(row.user) : row.user,
+    };
   }
 
   async create(data: createRosterDto) {

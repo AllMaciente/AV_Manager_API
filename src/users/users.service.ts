@@ -11,6 +11,7 @@ import type { SQL } from 'drizzle-orm';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
 import { circuito, equipamentos, userEquipamentos, users } from '../db/schema';
+import { buildDefaultAvatarUrl, withResolvedAvatar } from './avatar';
 import type { ListUsersQueryDto } from './users.schemas';
 
 export type CreateUserData = {
@@ -19,6 +20,7 @@ export type CreateUserData = {
     middleName?: string;
     lastName: string;
     email?: string;
+    avatarUrl?: string;
     password: string;
     isAdmin?: boolean;
     circuitoId?: string;
@@ -30,6 +32,7 @@ export type UpdateUserData = {
     middleName?: string | null;
     lastName?: string;
     email?: string | null;
+    avatarUrl?: string | null;
     circuitoId?: string | null;
 };
 
@@ -40,6 +43,7 @@ const userSummaryColumns = {
     middleName: users.middleName,
     lastName: users.lastName,
     email: users.email,
+    avatarUrl: users.avatarUrl,
     isAdmin: users.isAdmin,
     circuitoId: users.circuitoId,
     createdAt: users.createdAt,
@@ -101,7 +105,7 @@ export class UsersService {
         const total = Number(totalResult[0]?.count ?? 0);
 
         return {
-            items,
+            items: items.map(withResolvedAvatar),
             total,
             page,
             limit,
@@ -118,6 +122,7 @@ export class UsersService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                avatarUrl: users.avatarUrl,
                 password: users.password,
                 emailVerifiedAt: users.emailVerifiedAt,
                 createdAt: users.createdAt,
@@ -129,7 +134,7 @@ export class UsersService {
             .leftJoin(circuito, eq(users.circuitoId, circuito.id))
             .where(eq(users.id, id))
             .limit(1);
-        return user;
+        return user ? withResolvedAvatar(user) : user;
     }
 
     async findByEmail(email: string) {
@@ -198,6 +203,7 @@ export class UsersService {
                 middleName: data.middleName ?? null,
                 lastName: data.lastName,
                 email: data.email ?? null,
+                avatarUrl: data.avatarUrl ?? buildDefaultAvatarUrl(data),
                 password: data.password,
                 isAdmin: data.isAdmin ?? false,
                 circuitoId: data.circuitoId ?? null,
@@ -209,10 +215,11 @@ export class UsersService {
                 middleName: users.middleName,
                 lastName: users.lastName,
                 email: users.email,
+                avatarUrl: users.avatarUrl,
                 isAdmin: users.isAdmin,
                 circuitoId: users.circuitoId,
             });
-        return { ...user, circuitoName };
+        return { ...withResolvedAvatar(user), circuitoName };
     }
 
     async update(id: string, data: UpdateUserData) {
@@ -262,6 +269,7 @@ export class UsersService {
             middleName: user.middleName,
             lastName: user.lastName,
             email: user.email,
+            avatarUrl: user.avatarUrl,
             emailVerifiedAt: user.emailVerifiedAt,
             createdAt: user.createdAt,
             isAdmin: user.isAdmin,

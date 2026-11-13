@@ -29,6 +29,12 @@ const updateUserBaseSchema = z.object({
             z.string().email('Email inválido').toLowerCase().nullable(),
         )
         .optional(),
+    avatarUrl: z
+        .preprocess(
+            emptyToNull,
+            z.string().trim().url('URL inválida').max(500).nullable(),
+        )
+        .optional(),
 });
 
 const atLeastOneField = (data: Record<string, unknown>) =>

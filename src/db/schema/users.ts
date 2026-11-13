@@ -16,6 +16,7 @@ export const users = pgTable("users", {
     circuitoId: varchar('circuito_id', { length: 12 })
         .references(() => circuito.id, { onDelete: 'set null' }),
     email: text("email").unique(),
+    avatarUrl: text("avatar_url"),
     password: text("password").notNull(),
     emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
     createdAt: timestamp('created_at').defaultNow().notNull(),

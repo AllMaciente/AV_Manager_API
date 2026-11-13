@@ -37,6 +37,12 @@ const userSummaryProperties: Record<string, SchemaObject> = {
     nullable: true,
     example: 'joao@example.com',
   },
+  avatarUrl: {
+    type: 'string',
+    nullable: true,
+    example:
+      'https://api.dicebear.com/10.x/initials/svg?backgroundColor=57386f&seed=Jo%C3%A3o%20Silva',
+  },
   circuitoName: { type: 'string', nullable: true, example: 'SC-004' },
 };
 
@@ -227,6 +233,16 @@ export const updateProfileBodySchema: SchemaObject = {
       example: 'joao@example.com',
       description: 'Opcional. Envie null ou string vazia para remover.',
     },
+    avatarUrl: {
+      type: 'string',
+      format: 'uri',
+      maxLength: 500,
+      nullable: true,
+      example:
+        'https://api.dicebear.com/10.x/initials/svg?backgroundColor=57386f&seed=Jo%C3%A3o%20Silva',
+      description:
+        'Opcional. URL da foto de perfil. Envie null ou string vazia para voltar à foto padrão.',
+    },
   },
   description: 'Informe ao menos um campo',
 };
@@ -260,6 +276,16 @@ export const updateUserBodySchema: SchemaObject = {
       nullable: true,
       example: 'joao@example.com',
       description: 'Opcional. Envie null ou string vazia para remover.',
+    },
+    avatarUrl: {
+      type: 'string',
+      format: 'uri',
+      maxLength: 500,
+      nullable: true,
+      example:
+        'https://api.dicebear.com/10.x/initials/svg?backgroundColor=57386f&seed=Jo%C3%A3o%20Silva',
+      description:
+        'Opcional. URL da foto de perfil. Envie null ou string vazia para voltar à foto padrão.',
     },
     circuitoId: {
       type: 'string',

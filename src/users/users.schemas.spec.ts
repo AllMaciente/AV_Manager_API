@@ -27,6 +27,24 @@ describe('users schemas', () => {
         circuitoId: null,
       });
     });
+
+    it('accepts a circuitoId to change the link', () => {
+      expect(updateUserSchema.parse({ circuitoId: 'Aw_M6jP36B8F' })).toEqual({
+        circuitoId: 'Aw_M6jP36B8F',
+      });
+    });
+
+    it('normalizes an empty circuitoId to null', () => {
+      expect(updateUserSchema.parse({ circuitoId: '  ' })).toEqual({
+        circuitoId: null,
+      });
+    });
+
+    it('rejects a circuitoId longer than 12 characters', () => {
+      expect(
+        updateUserSchema.safeParse({ circuitoId: '1234567890123' }).success,
+      ).toBe(false);
+    });
   });
 
   describe('changePasswordSchema', () => {

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
@@ -33,6 +34,7 @@ export class AuthController {
     constructor(private auth: AuthService) { }
 
     @Post('register')
+    @Throttle({ default: { limit: 10, ttl: 60_000 } })
     @UseGuards(OptionalJwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
@@ -60,6 +62,7 @@ export class AuthController {
     }
 
     @UseGuards(LocalAuthGuard)
+    @Throttle({ default: { limit: 5, ttl: 60_000 } })
     @Post('login')
     @HttpCode(200)
     @ApiOperation({ summary: 'Fazer login com username e senha' })

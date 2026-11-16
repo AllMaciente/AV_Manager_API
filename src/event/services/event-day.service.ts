@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, gte, inArray, sql } from 'drizzle-orm';
 import { DRIZZLE } from 'src/db/db.module';
 import { event, eventDay } from 'src/db/schema';
 import { withResolvedAvatar } from 'src/users/avatar';
@@ -13,6 +13,7 @@ import type { DB } from 'src/db/db.module';
 import type {
   createEventDayDto,
   listCreateEventDayDto,
+  listEventDaysQueryDto,
   updateEventDayDto,
 } from '../schemas/event-day.schema';
 
@@ -33,14 +34,12 @@ const rosterRelations = {
 
 type DayWithRosterUsers = {
   rosters: Array<{
-    user:
-      | {
-          firstName: string;
-          middleName: string | null;
-          lastName: string;
-          avatarUrl: string | null;
-        }
-      | null;
+    user: {
+      firstName: string;
+      middleName: string | null;
+      lastName: string;
+      avatarUrl: string | null;
+    } | null;
   }>;
 };
 
@@ -56,11 +55,17 @@ const withResolvedUsers = <T extends DayWithRosterUsers>(day: T) => ({
 export class EventDayService {
   constructor(@Inject(DRIZZLE) private db: DB) {}
 
-  async getDays(eventId: string) {
+  async getDays(eventId: string, { includePast }: listEventDaysQueryDto) {
     await this.assertEventExists(eventId);
 
     const days = await this.db.query.eventDay.findMany({
-      where: { eventId },
+      // Por padrão só aparecem os dias a partir de hoje.
+      where: includePast
+        ? { eventId }
+        : {
+            eventId,
+            RAW: (day: typeof eventDay) => gte(day.date, sql`current_date`),
+          },
       with: {
         rosters: { with: rosterRelations },
       },

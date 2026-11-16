@@ -1,4 +1,11 @@
 import z from 'zod';
+import { includePastQuerySchema } from './event.schema';
+
+export const listEventDaysQuerySchema = z.object({
+  includePast: includePastQuerySchema,
+});
+
+export type listEventDaysQueryDto = z.infer<typeof listEventDaysQuerySchema>;
 
 export const createEventDaySchema = z.object({
   eventId: z.string().min(12),

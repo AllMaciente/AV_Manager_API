@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +20,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -37,11 +39,13 @@ import { EventDayService } from '../services/event-day.service';
 import {
   createEventDayBatchBodySchema,
   createEventDayBodySchema,
+  listEventDaysQuerySchema,
   updateEventDaySchema,
 } from '../schemas/event-day.schema';
 import type {
   createEventDayBatchBodyDto,
   createEventDayBodyDto,
+  listEventDaysQueryDto,
   updateEventDayDto,
 } from '../schemas/event-day.schema';
 
@@ -56,12 +60,18 @@ export class EventDayController {
   @ApiOperation({
     summary: 'Listar dias de um evento',
     description:
-      'Lista os dias do evento com as escalas de cada dia. Disponível para qualquer usuário autenticado.',
+      'Lista os dias do evento com as escalas de cada dia. Por padrão retorna apenas os dias a partir de hoje. Disponível para qualquer usuário autenticado.',
   })
   @ApiParam({
     name: 'eventId',
     description: 'ID do evento',
     example: 'V1StGXR8_Z5j',
+  })
+  @ApiQuery({
+    name: 'includePast',
+    required: false,
+    enum: ['true', 'false'],
+    description: 'Inclui os dias passados (padrão false)',
   })
   @ApiOkResponse({
     description: 'Dias do evento',
@@ -72,8 +82,12 @@ export class EventDayController {
     schema: errorSchema,
   })
   @ApiUnauthorizedResponse({ schema: errorSchema })
-  findAll(@Param('eventId') eventId: string) {
-    return this.days.getDays(eventId);
+  findAll(
+    @Param('eventId') eventId: string,
+    @Query(new ZodValidationPipe(listEventDaysQuerySchema))
+    query: listEventDaysQueryDto,
+  ) {
+    return this.days.getDays(eventId, query);
   }
 
   @Get(':date')

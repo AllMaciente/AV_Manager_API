@@ -461,10 +461,19 @@ export const equipamentoUserSchema: SchemaObject = {
   type: 'object',
   properties: {
     ...userSummaryProperties,
+    circuitoId: { type: 'string', nullable: true, example: 'Aw_M6jP36B8F' },
     ordem: { type: 'integer', example: 1 },
     sabeOperar: { type: 'boolean', example: true },
   },
-  required: ['id', 'username', 'firstName', 'lastName', 'ordem', 'sabeOperar'],
+  required: [
+    'id',
+    'username',
+    'firstName',
+    'lastName',
+    'circuitoId',
+    'ordem',
+    'sabeOperar',
+  ],
 };
 
 export const equipamentoUserListSchema: SchemaObject = {

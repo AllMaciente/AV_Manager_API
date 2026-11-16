@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { DRIZZLE } from '../db/db.module';
 import type { DB } from '../db/db.module';
-import { equipamentos, circuito, userEquipamentos, users } from 'src/db/schema';
+import { equipamentos, circuito, eventCircuit, roster, userEquipamentos, users } from 'src/db/schema';
 import { and, asc, eq, inArray, notInArray, sql } from 'drizzle-orm';
 import { withResolvedAvatar } from '../users/avatar';
 
@@ -46,6 +46,30 @@ export class EquipamentosService {
         return row;
     }
 
+    async remove(id: string) {
+        await this.findById(id);
+
+        const [inUse] = await this.db
+            .select({ id: roster.id })
+            .from(roster)
+            .where(eq(roster.equipamentoId, id))
+            .limit(1);
+
+        if (inUse) {
+            throw new ConflictException(
+                'Equipamento em uso em escalas e não pode ser removido',
+            );
+        }
+
+        const [row] = await this.db
+            .delete(equipamentos)
+            .where(eq(equipamentos.id, id))
+            .returning();
+
+        if (!row) throw new NotFoundException('Equipamento não encontrado');
+        return row;
+    }
+
     async findUsers(equipamentoId: string) {
         await this.findById(equipamentoId);
 
@@ -68,6 +92,38 @@ export class EquipamentosService {
             .leftJoin(circuito, eq(circuito.id, users.circuitoId))
             .where(eq(userEquipamentos.equipamentoId, equipamentoId))
             .orderBy(asc(userEquipamentos.ordem));
+
+        return rows.map(withResolvedAvatar);
+    }
+
+    async findEligibleUsers(equipamentoId: string, eventId: string) {
+        await this.findById(equipamentoId);
+
+        const rows = await this.db
+            .select({
+                id: users.id,
+                username: users.username,
+                firstName: users.firstName,
+                middleName: users.middleName,
+                lastName: users.lastName,
+                email: users.email,
+                avatarUrl: users.avatarUrl,
+                circuitoId: users.circuitoId,
+                circuitoName: circuito.name,
+                ordem: userEquipamentos.ordem,
+                sabeOperar: userEquipamentos.sabeOperar,
+            })
+            .from(userEquipamentos)
+            .innerJoin(users, eq(userEquipamentos.userId, users.id))
+            .innerJoin(circuito, eq(circuito.id, users.circuitoId))
+            .innerJoin(eventCircuit, eq(eventCircuit.circuitId, users.circuitoId))
+            .where(
+                and(
+                    eq(userEquipamentos.equipamentoId, equipamentoId),
+                    eq(eventCircuit.eventId, eventId),
+                ),
+            )
+            .orderBy(asc(userEquipamentos.ordem), asc(users.username));
 
         return rows.map(withResolvedAvatar);
     }

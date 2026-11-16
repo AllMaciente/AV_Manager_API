@@ -12,3 +12,9 @@ export const setOrderBodySchema = z.object({
 });
 
 export type setOrderBodyDto = z.infer<typeof setOrderBodySchema>;
+
+export const eligibleUsersQuerySchema = z.object({
+    eventId: z.string().trim().min(12).max(12),
+});
+
+export type eligibleUsersQueryDto = z.infer<typeof eligibleUsersQuerySchema>;

@@ -93,16 +93,9 @@ export class AuthService {
         return this.login(user);
     }
 
-    private signToken(user: TokenUser) {
-        return this.jwt.signAsync({
-            sub: user.id,
-            username: user.username,
-            firstName: user.firstName,
-            middleName: user.middleName,
-            lastName: user.lastName,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            circuitoId: user.circuitoId,
-        });
+    private signToken(user: Pick<TokenUser, 'id'>) {
+        // Sem dados pessoais nem claims de autorização no payload: o
+        // JwtStrategy busca o estado atual do usuário no banco.
+        return this.jwt.signAsync({ sub: user.id });
     }
 }

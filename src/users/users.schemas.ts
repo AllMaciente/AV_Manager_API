@@ -32,7 +32,16 @@ const updateUserBaseSchema = z.object({
     avatarUrl: z
         .preprocess(
             emptyToNull,
-            z.string().trim().url('URL inválida').max(500).nullable(),
+            z
+                .string()
+                .trim()
+                .url('URL inválida')
+                .max(500)
+                .refine(
+                    (value) => /^https?:\/\//i.test(value),
+                    'A URL deve usar http ou https',
+                )
+                .nullable(),
         )
         .optional(),
 });

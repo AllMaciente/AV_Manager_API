@@ -34,6 +34,7 @@ test
 README.md
 docs
 
-# arquivos de ambiente (veja a observação abaixo)
+# arquivos de ambiente: nunca entram no contexto/imagem
+.env
 .env.*
 !.env.example

@@ -12,6 +12,7 @@ RUN npm run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3001
 
 # Apenas dependências de produção: drizzle-kit (devDependency) fica fora da imagem.
 COPY package*.json ./
@@ -20,9 +21,8 @@ RUN npm ci --omit=dev
 # O dist já inclui a pasta drizzle/ (copiada no postbuild).
 COPY --from=builder /app/dist ./dist
 
-# o .env vai junto com a imagem (veja o aviso abaixo)
-COPY .env ./.env
-
+# Segredos NÃO entram na imagem: injete DATABASE_URL, JWT_SECRET etc. em
+# runtime (docker run -e, docker compose env_file, Kubernetes Secret, etc.).
 EXPOSE 3001
 USER node
 
